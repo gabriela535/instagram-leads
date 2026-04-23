@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Lead Qualifier</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{background:#f5f5f5;color:#1a1a1a}
+.header{background:#fff;border-bottom:1px solid #e5e5e5;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
+.logo-icon{width:28px;height:28px;background:#E1306C;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.main{padding:24px;max-width:1200px;margin:0 auto}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #e5e5e5}
+.stat-label{font-size:12px;color:#888;margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:600}
+.card{background:#fff;border-radius:10px;border:1px solid #e5e5e5;padding:16px;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.score-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.rule{padding:10px 12px;border-radius:8px;border:1px solid transparent}
+.rule-green{background:#eaf3de;border-color:#c0dd97}.rule-amber{background:#faeeda;border-color:#fac775}.rule-red{background:#fcebeb;border-color:#f7c1c1}
+.rule-title{font-size:11px;font-weight:600;margin-bottom:2px}
+.rule-green .rule-title{color:#3b6d11}.rule-amber .rule-title{color:#854f0b}.rule-red .rule-title{color:#a32d2d}
+.rule-pts{font-size:17px;font-weight:700}
+.rule-green .rule-pts{color:#3b6d11}.rule-amber .rule-pts{color:#ba7517}.rule-red .rule-pts{color:#e24b4a}
+.kw-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.kw-badge{font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid transparent;cursor:pointer}
+.kw-hot{background:#D85A30;color:#fff}.kw-warm{background:#BA7517;color:#fff}
+.kw-add{display:flex;gap:6px;margin-top:6px}
+.kw-add input{font-size:12px;padding:5px 10px;border:1px solid #ddd;border-radius:20px;width:160px}
+.kw-add button{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid #ddd;background:#fff;cursor:pointer}
+.filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.filters label{font-size:13px;color:#666}
+.filters input,.filters select{font-size:13px;padding:6px 10px;border:1px solid #ddd;border-radius:8px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.btn{font-size:13px;padding:7px 14px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn:hover{background:#f5f5f5}
+.btn-pink{background:#E1306C;color:#fff;border-color:#E1306C}
+.btn-pink:hover{background:#c0235a}
+.btn-apify{background:#ff7b00;color:#fff;border-color:#ff7b00}
+.btn-apify:hover{background:#e06d00}
+.table{background:#fff;border-radius:10px;border:1px solid #e5e5e5;overflow:hidden}
+.table-header{display:grid;grid-template-columns:36px 200px 100px 80px 110px 1fr 120px;gap:8px;padding:10px 16px;background:#f9f9f9;font-size:12px;font-weight:600;color:#888;border-bottom:1px solid #e5e5e5}
+.lead-row{display:grid;grid-template-columns:36px 200px 100px 80px 110px 1fr 120px;gap:8px;padding:10px 16px;align-items:center;border-bottom:1px solid #f0f0f0}
+.lead-row:last-child{border-bottom:none}
+.lead-row:hover{background:#fafafa}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.lead-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead-handle{font-size:11px;color:#888}
+.badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;white-space:nowrap}
+.b-open{background:#eaf3de;color:#3b6d11}.b-closed{background:#f0f0f0;color:#666}
+.b-link{background:#e6f1fb;color:#185fa5}.b-nolink{background:#f0f0f0;color:#888}
+.score-wrap{display:flex;align-items:center;gap:6px}
+.score-bar{height:6px;border-radius:3px;flex:1;background:#f0f0f0;overflow:hidden}
+.score-fill{height:100%;border-radius:3px}
+.score-num{font-size:13px;font-weight:700;min-width:26px;text-align:right}
+.bio-cell{font-size:12px;color:#666;line-height:1.4}
+.btn-analyze{font-size:11px;padding:3px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#666}
+.btn-analyze:hover{background:#f5f5f5}
+.btn-direct{font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+.btn-direct:hover{background:#E1306C;color:#fff;border-color:#E1306C}
+.dots{display:inline-flex;gap:3px}
+.dots span{width:4px;height:4px;border-radius:50%;background:#999;animation:pulse 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99}
+.modal-box{background:#fff;border-radius:12px;padding:24px;width:420px;max-width:95vw}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#888}
+.modal-user{display:flex;align-items:center;gap:10px;padding:10px;background:#f5f5f5;border-radius:8px;margin-bottom:10px}
+.modal-breakdown{font-size:12px;color:#666;background:#f5f5f5;border-radius:8px;padding:8px 12px;margin-bottom:10px;line-height:1.8}
+.modal-textarea{width:100%;min-height:90px;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical;font-family:inherit}
+.modal-status{font-size:12px;color:#888;margin:6px 0;min-height:16px}
+.modal-footer{display:flex;justify-content:space-between;margin-top:12px;gap:8px}
+.hidden{display:none}
+.success{font-size:13px;color:#3b6d11;background:#eaf3de;padding:10px;border-radius:8px;text-align:center;margin-top:10px}
+.apify-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99}
+.apify-box{background:#fff;border-radius:12px;padding:24px;width:460px;max-width:95vw}
+.apify-box h2{font-size:16px;font-weight:600;margin-bottom:6px}
+.apify-box p{font-size:13px;color:#666;margin-bottom:14px}
+.apify-box input{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:10px}
+.apify-box label{font-size:13px;color:#666;display:block;margin-bottom:4px}
+.progress{height:4px;background:#f0f0f0;border-radius:2px;overflow:hidden;margin-bottom:16px}
+.progress-fill{height:100%;background:#E1306C;border-radius:2px;transition:width .3s}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><div class="logo-icon">IG</div> Instagram Lead Qualifier</div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-apify" onclick="openApify()">Buscar leads no Instagram</button>
+    <button class="btn" onclick="requalify()">Re-qualificar</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Total de leads</div><div class="stat-val" id="s-total">0</div></div>
+    <div class="stat"><div class="stat-label">Score alto (+70)</div><div class="stat-val" id="s-high" style="color:#D85A30">0</div></div>
+    <div class="stat"><div class="stat-label">Aberto + link</div><div class="stat-val" id="s-linkopen" style="color:#3b6d11">0</div></div>
+    <div class="stat"><div class="stat-label">Qualificados (+40)</div><div class="stat-val" id="s-qual" style="color:#185fa5">0</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Regras de score</div>
+    <div class="score-rules">
+      <div class="rule rule-green"><div class="rule-title">Aberto + link na bio</div><div class="rule-pts">+40 pts</div></div>
+      <div class="rule rule-amber"><div class="rule-title">Aberto sem link</div><div class="rule-pts">+15 pts</div></div>
+      <div class="rule rule-red"><div class="rule-title">Perfil fechado</div><div class="rule-pts">+5 pts</div></div>
+    </div>
+    <div style="margin-bottom:6px;font-size:11px;font-weight:600;color:#888;letter-spacing:.05em">HOT +25pts</div>
+    <div class="kw-row" id="kw-hot"></div>
+    <div class="kw-add"><input id="new-hot" placeholder="Nova keyword HOT..." onkeydown="if(event.key==='Enter')addKw('hot')"><button onclick="addKw('hot')">+ Adicionar</button></div>
+    <div style="margin:10px 0 6px;font-size:11px;font-weight:600;color:#888;letter-spacing:.05em">WARM +10pts</div>
+    <div class="kw-row" id="kw-warm"></div>
+    <div class="kw-add"><input id="new-warm" placeholder="Nova keyword WARM..." onkeydown="if(event.key==='Enter')addKw('warm')"><button onclick="addKw('warm')">+ Adicionar</button></div>
+    <div style="margin:12px 0 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <label style="font-size:13px;color:#666">Score mínimo</label>
+      <input type="number" id="score-min" value="25" min="0" max="100" style="width:65px;padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:8px" oninput="renderLeads()">
+      <label style="font-size:13px;color:#666">Perfil</label>
+      <select id="filter-type" onchange="renderLeads()" style="padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:8px">
+        <option value="all">Todos</option><option value="open">Aberto</option><option value="link">Aberto + link</option><option value="closed">Fechado</option>
+      </select>
+      <label style="font-size:13px;color:#666">Ordenar</label>
+      <select id="sort-by" onchange="renderLeads()" style="padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:8px">
+        <option value="score">Score</option><option value="name">Nome</option><option value="followers">Seguidores</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="progress"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+  <div class="toolbar">
+    <div style="font-size:13px;color:#666" id="analyze-status"></div>
+    <button class="btn" id="btn-all" onclick="analyzeAll()">Analisar todos com IA</button>
+  </div>
+
+  <div class="table">
+    <div class="table-header">
+      <div></div><div>Perfil</div><div>Status</div><div>Seguidores</div><div>Score</div><div>Análise IA</div><div>Ação</div>
+    </div>
+    <div id="leads-body"></div>
+  </div>
+</div>
+
+<!-- Modal Direct -->
+<div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-title">Enviar Direct <button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-user" id="modal-user"></div>
+    <div class="modal-breakdown" id="modal-breakdown"></div>
+    <div class="modal-status" id="modal-status"></div>
+    <textarea class="modal-textarea" id="msg-text" placeholder="Escreva ou gere com IA..."></textarea>
+    <div id="sent-ok" class="success hidden">Mensagem copiada! Abrindo Instagram...</div>
+    <div class="modal-footer">
+      <button class="btn" onclick="generateMsg()">Gerar com IA</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-pink" onclick="sendDirect()">Copiar e abrir IG</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Apify -->
+<div id="apify-modal" class="apify-modal hidden">
+  <div class="apify-box">
+    <h2>Buscar leads no Instagram</h2>
+    <p>Digite o @ de uma conta do Instagram (ex: um concorrente ou parceiro) e vamos buscar os seguidores dela como leads.</p>
+    <label>Perfil do Instagram para buscar seguidores</label>
+    <input id="apify-username" placeholder="ex: lojaexemplo (sem o @)">
+    <label>Quantidade máxima de leads</label>
+    <input id="apify-limit" type="number" value="100" min="10" max="500">
+    <div id="apify-status" style="font-size:13px;color:#666;margin-bottom:10px;min-height:18px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeApify()">Cancelar</button>
+      <button class="btn btn-apify" onclick="runApify()">Buscar leads</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://imrsllqxvwizrukyymfd.supabase.co
+';
+const SUPABASE_KEY = 'sb_publishable_p0bKFOsPrA0v266Nqb6Ipg_K5rrAeAR';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let hotKws=['gateway','checkout','ecommerce','payment','loja virtual','vendas online'];
+let warmKws=['negócios','mei','cnpj','empresa','empresário','microempreendedor'];
+const COLORS=['#E1306C','#405DE6','#833AB4','#FCAF45','#F77737','#5851DB'];
+const bioCache={};
+let currentLead=null;
+let allLeads=[];
+
+async function loadLeads(){
+  const{data}=await sb.from('leads').select('*').order('score',{ascending:false});
+  allLeads=data||[];
+  renderLeads();
+}
+
+function calcScore(lead){
+  let score=0,breakdown=[];
+  if(lead.is_open&&lead.has_link){score+=40;breakdown.push({pts:'+40',desc:'Aberto + link'});}
+  else if(lead.is_open){score+=15;breakdown.push({pts:'+15',desc:'Aberto sem link'});}
+  else{score+=5;breakdown.push({pts:'+5',desc:'Perfil fechado'});}
+  const bio=(lead.bio||'').toLowerCase();
+  hotKws.forEach(k=>{if(bio.includes(k)){score+=25;breakdown.push({pts:'+25',desc:`HOT: "${k}"`});}});
+  warmKws.forEach(k=>{if(bio.includes(k)){score+=10;breakdown.push({pts:'+10',desc:`WARM: "${k}"`});}});
+  return{score:Math.max(0,Math.min(100,score)),breakdown};
+}
+
+function scoreColor(s){return s>=70?'#D85A30':s>=40?'#BA7517':'#999';}
+
+function renderKw(){
+  ['hot','warm'].forEach(type=>{
+    const list=type==='hot'?hotKws:warmKws;
+    const el=document.getElementById('kw-'+type);
+    el.innerHTML='';
+    list.forEach((k,i)=>{
+      const b=document.createElement('span');
+      b.className='kw-badge kw-'+type;
+      b.innerHTML=k+` <span style="opacity:.7;cursor:pointer" onclick="removeKw('${type}',${i},event)">×</span>`;
+      el.appendChild(b);
+    });
+  });
+}
+
+function addKw(type){
+  const inp=document.getElementById('new-'+type);
+  const val=inp.value.trim().toLowerCase();
+  if(!val)return;
+  if(type==='hot'&&!hotKws.includes(val))hotKws.push(val);
+  if(type==='warm'&&!warmKws.includes(val))warmKws.push(val);
+  inp.value='';renderKw();renderLeads();
+}
+
+function removeKw(type,i,e){
+  e.stopPropagation();
+  if(type==='hot')hotKws.splice(i,1);else warmKws.splice(i,1);
+  renderKw();renderLeads();
+}
+
+function renderLeads(){
+  const minScore=parseInt(document.getElementById('score-min').value)||0;
+  const filterType=document.getElementById('filter-type').value;
+  const sortBy=document.getElementById('sort-by').value;
+  let leads=allLeads.map((l,i)=>({...l,color:COLORS[i%COLORS.length],...calcScore(l)}));
+  leads=leads.filter(l=>l.score>=minScore);
+  if(filterType==='open')leads=leads.filter(l=>l.is_open);
+  if(filterType==='link')leads=leads.filter(l=>l.is_open&&l.has_link);
+  if(filterType==='closed')leads=leads.filter(l=>!l.is_open);
+  if(sortBy==='score')leads.sort((a,b)=>b.score-a.score);
+  if(sortBy==='name')leads.sort((a,b)=>(a.full_name||'').localeCompare(b.full_name||''));
+  if(sortBy==='followers')leads.sort((a,b)=>(b.followers||0)-(a.followers||0));
+  document.getElementById('s-total').textContent=leads.length;
+  document.getElementById('s-high').textContent=leads.filter(l=>l.score>=70).length;
+  document.getElementById('s-linkopen').textContent=leads.filter(l=>l.is_open&&l.has_link).length;
+  document.getElementById('s-qual').textContent=leads.filter(l=>l.score>=40).length;
+  const body=document.getElementById('leads-body');
+  body.innerHTML='';
+  if(leads.length===0){body.innerHTML='<div style="padding:40px;text-align:center;color:#999">Nenhum lead encontrado. Clique em "Buscar leads no Instagram" para começar!</div>';return;}
+  leads.forEach(l=>{
+    const sc=scoreColor(l.score);
+    const initials=(l.full_name||l.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const bioContent=l.bio_summary?`<span>${l.bio_summary}</span>`:`<button class="btn-analyze" onclick="analyzeSingle('${l.id}',this.parentElement)">Analisar com IA</button>`;
+    const row=document.createElement('div');
+    row.className='lead-row';
+    row.innerHTML=`
+      <div class="avatar" style="background:${l.color}22;color:${l.color}">${initials}</div>
+      <div><div class="lead-name">${l.full_name||l.username}</div><div class="lead-handle">@${l.username}</div></div>
+      <div style="display:flex;gap:3px;flex-wrap:wrap">
+        <span class="badge ${l.is_open?'b-open':'b-closed'}">${l.is_open?'Aberto':'Fechado'}</span>
+        <span class="badge ${l.has_link?'b-link':'b-nolink'}">${l.has_link?'Link':'Sem link'}</span>
+      </div>
+      <div style="font-size:13px;color:#666">${(l.followers||0).toLocaleString('pt-BR')}</div>
+      <div class="score-wrap"><div class="score-bar"><div class="score-fill" style="width:${l.score}%;background:${sc}"></div></div><span class="score-num" style="color:${sc}">${l.score}</span></div>
+      <div class="bio-cell" id="bio-${l.id}">${bioContent}</div>
+      <button class="btn-direct" onclick="openDirect('${l.id}')">Direct</button>`;
+    body.appendChild(row);
+  });
+}
+
+async function fetchBio(lead){
+  if(bioCache[lead.id])return bioCache[lead.id];
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:`Analise esta bio do Instagram e responda em UMA linha curta (máx 12 palavras) em português: qual é o negócio ou perfil desta pessoa? Bio: "${lead.bio}". Responda APENAS com a descrição.`}]})
+  });
+  const data=await res.json();
+  const txt=data.content?.find(c=>c.type==='text')?.text||'Não foi possível analisar';
+  bioCache[lead.id]=txt;
+  await sb.from('leads').update({bio_summary:txt}).eq('id',lead.id);
+  return txt;
+}
+
+async function analyzeSingle(id,cellEl){
+  const lead=allLeads.find(l=>l.id===id);
+  if(!lead)return;
+  cellEl.innerHTML=`<span class="dots"><span></span><span></span><span></span></span>`;
+  const txt=await fetchBio(lead).catch(()=>'Erro na análise');
+  cellEl.innerHTML=txt;
+  const idx=allLeads.findIndex(l=>l.id===id);
+  if(idx>=0)allLeads[idx].bio_summary=txt;
+}
+
+async function analyzeAll(){
+  const btn=document.getElementById('btn-all');
+  btn.disabled=true;btn.textContent='Analisando...';
+  const pending=allLeads.filter(l=>!l.bio_summary&&l.bio);
+  let done=0;
+  for(let i=0;i<pending.length;i+=3){
+    const batch=pending.slice(i,i+3);
+    await Promise.all(batch.map(async lead=>{
+      const cell=document.getElementById('bio-'+lead.id);
+      if(cell)cell.innerHTML=`<span class="dots"><span></span><span></span><span></span></span>`;
+      const txt=await fetchBio(lead).catch(()=>'Erro');
+      if(cell)cell.innerHTML=txt;
+      const idx=allLeads.findIndex(l=>l.id===lead.id);
+      if(idx>=0)allLeads[idx].bio_summary=txt;
+      done++;
+      document.getElementById('analyze-status').textContent=`Analisando ${done} de ${pending.length}...`;
+    }));
+  }
+  document.getElementById('analyze-status').textContent=`✓ ${allLeads.length} perfis analisados`;
+  btn.disabled=false;btn.textContent='Analisar todos com IA';
+}
+
+function requalify(){
+  const bar=document.getElementById('progress');
+  let p=0;bar.style.width='0%';
+  const iv=setInterval(()=>{p+=15;if(p>=100){p=100;clearInterval(iv);setTimeout(()=>bar.style.width='0%',500);}bar.style.width=p+'%';},80);
+  renderLeads();
+}
+
+function openDirect(id){
+  currentLead=allLeads.find(l=>l.id===id);
+  if(!currentLead)return;
+  const{score,breakdown}=calcScore(currentLead);
+  const color=COLORS[allLeads.indexOf(currentLead)%COLORS.length];
+  const initials=(currentLead.full_name||currentLead.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('modal-user').innerHTML=`
+    <div class="avatar" style="width:38px;height:38px;background:${color}22;color:${color}">${initials}</div>
+    <div><div style="font-weight:600;font-size:14px">${currentLead.full_name||currentLead.username}</div>
+    <div style="font-size:12px;color:#888">@${currentLead.username} · ${currentLead.is_open?'Aberto':'Fechado'}${currentLead.has_link?' · Link':''}</div></div>
+    <div style="margin-left:auto;font-size:22px;font-weight:700;color:${scoreColor(score)}">${score}</div>`;
+  document.getElementById('modal-breakdown').innerHTML='<b>Score:</b> '+breakdown.map(b=>`<span style="color:${b.pts.startsWith('+')?'#3b6d11':'#a32d2d'}">${b.pts}</span> ${b.desc}`).join(' · ');
+  document.getElementById('msg-text').value='';
+  document.getElementById('modal-status').textContent='';
+  document.getElementById('sent-ok').classList.add('hidden');
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function closeModal(){document.getElementById('modal').classList.add('hidden');currentLead=null;}
+
+async function generateMsg(){
+  if(!currentLead)return;
+  document.getElementById('modal-status').textContent='Gerando mensagem...';
+  document.getElementById('msg-text').value='';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:`Crie uma mensagem curta de prospecção para Instagram Direct (máximo 3 linhas, tom natural) para "${currentLead.full_name||currentLead.username}" (@${currentLead.username}). Bio: "${currentLead.bio||'sem bio'}". Perfil ${currentLead.is_open?'aberto':'fechado'}${currentLead.has_link?', tem link na bio':''}. Ofereço soluções de pagamento e ecommerce. Responda APENAS com o texto da mensagem.`}]})
+    });
+    const data=await res.json();
+    const txt=data.content?.find(c=>c.type==='text')?.text||'Oi! Vi seu perfil e me interessei pelo que você faz. Tenho uma solução que pode ajudar muito suas vendas. Posso te contar mais?';
+    document.getElementById('msg-text').value=txt;
+    document.getElementById('modal-status').textContent='Pronto! Edite se quiser.';
+    await sb.from('leads').update({direct_message:txt}).eq('id',currentLead.id);
+  }catch(e){document.getElementById('modal-status').textContent='Erro — tente novamente';}
+}
+
+async function sendDirect(){
+  const msg=document.getElementById('msg-text').value.trim();
+  if(!msg||!currentLead)return;
+  navigator.clipboard.writeText(msg).catch(()=>{});
+  window.open(`https://ig.me/m/${currentLead.username}`,'_blank');
+  await sb.from('leads').update({direct_sent:true}).eq('id',currentLead.id);
+  document.getElementById('sent-ok').classList.remove('hidden');
+  setTimeout(()=>closeModal(),2000);
+}
+
+function openApify(){document.getElementById('apify-modal').classList.remove('hidden');}
+function closeApify(){document.getElementById('apify-modal').classList.add('hidden');}
+
+async function runApify(){
+  const username=document.getElementById('apify-username').value.trim();
+  const limit=parseInt(document.getElementById('apify-limit').value)||100;
+  if(!username){alert('Digite um username!');return;}
+  document.getElementById('apify-status').textContent='Iniciando busca no Apify...';
+  try{
+    const startRes=await fetch(`https://api.apify.com/v2/acts/apify~instagram-followers-count-scraper/runs?token=${window.APIFY_TOKEN}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({usernames:[username],maxItems:limit})
+    });
+    const startData=await startRes.json();
+    const runId=startData.data?.id;
+    if(!runId){document.getElementById('apify-status').textContent='Erro ao iniciar. Verifique o token do Apify.';return;}
+    document.getElementById('apify-status').textContent='Buscando leads... aguarde (pode demorar 1-2 min)';
+    await new Promise(r=>setTimeout(r,30000));
+    const resRes=await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${window.APIFY_TOKEN}`);
+    const items=await resRes.json();
+    if(!items.length){document.getElementById('apify-status').textContent='Nenhum resultado encontrado.';return;}
+    let saved=0;
+    for(const item of items){
+      const lead={
+        username:item.username||item.handle||'',
+        full_name:item.fullName||item.name||'',
+        bio:item.biography||item.bio||'',
+        followers:item.followersCount||item.followers||0,
+        following:item.followingCount||item.following||0,
+        is_open:!item.isPrivate,
+        has_link:!!(item.externalUrl||item.url||item.website),
+        link_url:item.externalUrl||item.url||item.website||'',
+        is_business:item.isBusinessAccount||false,
+        score:0
+      };
+      if(!lead.username)continue;
+      await sb.from('leads').upsert(lead,{onConflict:'username'});
+      saved++;
+    }
+    document.getElementById('apify-status').textContent=`✓ ${saved} leads salvos!`;
+    setTimeout(()=>{closeApify();loadLeads();},1500);
+  }catch(e){document.getElementById('apify-status').textContent='Erro: '+e.message;}
+}
+
+window.ANTHROPIC_KEY='';
+window.APIFY_TOKEN='';
+
+async function init(){
+  try{
+    const res=await fetch('/api/config');
+    const cfg=await res.json();
+    window.ANTHROPIC_KEY=cfg.anthropicKey||'';
+    window.APIFY_TOKEN=cfg.apifyToken||'';
+  }catch(e){}
+  renderKw();
+  await loadLeads();
+}
+
+init();
+</script>
+</body>
+</html>
