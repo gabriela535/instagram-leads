@@ -391,26 +391,66 @@ async function runApify(){
   const username=document.getElementById('apify-username').value.trim();
   const limit=parseInt(document.getElementById('apify-limit').value)||100;
   if(!username){alert('Digite um username!');return;}
-  document.getElementById('apify-status').textContent='Iniciando busca no Apify...';
+  
+  document.getElementById('apify-status').textContent='Passo 1/3: Buscando seguidores...';
+  
   try{
-    const startRes=await fetch(`https://api.apify.com/v2/acts/apify~instagram-followers-count-scraper/runs?token=${window.APIFY_TOKEN}`,{
+    // ACTOR 1: Pega lista de seguidores (sem cookies)
+    const run1=await fetch(`https://api.apify.com/v2/acts/scraping_solutions~instagram-scraper-followers-following-no-cookies/runs?token=${window.APIFY_TOKEN}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({usernames:[username],maxItems:limit})
+      body:JSON.stringify({account:username,count:limit,scrapeType:'Followers'})
     });
-    const startData=await startRes.json();
-    const runId=startData.data?.id;
-    if(!runId){document.getElementById('apify-status').textContent='Erro ao iniciar. Verifique o token do Apify.';return;}
-    document.getElementById('apify-status').textContent='Buscando leads... aguarde (pode demorar 1-2 min)';
-    await new Promise(r=>setTimeout(r,30000));
-    const resRes=await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${window.APIFY_TOKEN}`);
-    const items=await resRes.json();
-    if(!items.length){document.getElementById('apify-status').textContent='Nenhum resultado encontrado.';return;}
+    const run1Data=await run1.json();
+    const runId1=run1Data.data?.id;
+    if(!runId1){document.getElementById('apify-status').textContent='Erro no Actor 1. Verifique o token do Apify.';return;}
+    
+    // Aguarda Actor 1 terminar
+    document.getElementById('apify-status').textContent='Passo 1/3: Aguardando seguidores... (1-2 min)';
+    await waitForRun(runId1);
+    
+    // Pega resultados do Actor 1
+    const res1=await fetch(`https://api.apify.com/v2/actor-runs/${runId1}/dataset/items?token=${window.APIFY_TOKEN}`);
+    const followers=await res1.json();
+    if(!followers.length){document.getElementById('apify-status').textContent='Nenhum seguidor encontrado.';return;}
+    
+    // Filtra usernames que JÁ existem no banco para não cobrar de novo
+    document.getElementById('apify-status').textContent='Passo 2/3: Verificando leads novos...';
+    const usernames=followers.map(f=>f.username||f.userName).filter(Boolean);
+    const{data:existing}=await sb.from('leads').select('username').in('username',usernames);
+    const existingSet=new Set((existing||[]).map(e=>e.username));
+    const newUsernames=usernames.filter(u=>!existingSet.has(u));
+    
+    if(!newUsernames.length){
+      document.getElementById('apify-status').textContent='Todos os seguidores já estão no banco!';
+      return;
+    }
+    
+    document.getElementById('apify-status').textContent=`Passo 2/3: ${newUsernames.length} leads novos encontrados. Buscando bios...`;
+    
+    // ACTOR 2: Pega bio de cada username novo
+    const run2=await fetch(`https://api.apify.com/v2/acts/datadoping~instagram-followers-scraper-with-details/runs?token=${window.APIFY_TOKEN}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({usernames:newUsernames})
+    });
+    const run2Data=await run2.json();
+    const runId2=run2Data.data?.id;
+    if(!runId2){document.getElementById('apify-status').textContent='Erro no Actor 2.';return;}
+    
+    document.getElementById('apify-status').textContent='Passo 3/3: Buscando bios... (pode demorar)';
+    await waitForRun(runId2);
+    
+    // Pega resultados do Actor 2
+    const res2=await fetch(`https://api.apify.com/v2/actor-runs/${runId2}/dataset/items?token=${window.APIFY_TOKEN}`);
+    const profiles=await res2.json();
+    
+    // Salva no banco
     let saved=0;
-    for(const item of items){
+    for(const item of profiles){
       const lead={
-        username:item.username||item.handle||'',
-        full_name:item.fullName||item.name||'',
+        username:item.username||'',
+        full_name:item.fullName||item.full_name||'',
         bio:item.biography||item.bio||'',
         followers:item.followersCount||item.followers||0,
         following:item.followingCount||item.following||0,
@@ -418,15 +458,28 @@ async function runApify(){
         has_link:!!(item.externalUrl||item.url||item.website),
         link_url:item.externalUrl||item.url||item.website||'',
         is_business:item.isBusinessAccount||false,
+        fonte:username,
         score:0
       };
       if(!lead.username)continue;
       await sb.from('leads').upsert(lead,{onConflict:'username'});
       saved++;
     }
-    document.getElementById('apify-status').textContent=`✓ ${saved} leads salvos!`;
-    setTimeout(()=>{closeApify();loadLeads();},1500);
-  }catch(e){document.getElementById('apify-status').textContent='Erro: '+e.message;}
+    document.getElementById('apify-status').textContent=`✓ ${saved} leads novos salvos! (${existingSet.size} duplicatas ignoradas)`;
+    setTimeout(()=>{closeApify();loadLeads();},2000);
+  }catch(e){
+    document.getElementById('apify-status').textContent='Erro: '+e.message;
+  }
+}
+
+async function waitForRun(runId){
+  while(true){
+    await new Promise(r=>setTimeout(r,5000));
+    const res=await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${window.APIFY_TOKEN}`);
+    const data=await res.json();
+    const status=data.data?.status;
+    if(status==='SUCCEEDED'||status==='FAILED'||status==='ABORTED')return status;
+  }
 }
 
 window.ANTHROPIC_KEY='';
