@@ -395,11 +395,11 @@ async function runApify(){
   
   try{
     // ACTOR 1: Pega lista de seguidores (sem cookies)
-    const run1=await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'startRun',payload:{actorId:'scraping_solutions~instagram-scraper-followers-following-no-cookies',input:{Account:[username],resultsLimit:limit}}})});
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-     body:JSON.stringify({Account:[username],resultsLimit:limit})
-    });
+    const run1=await fetch('/api/apify',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({action:'startRun',payload:{actorId:'scraping_solutions~instagram-scraper-followers-following-no-cookies',input:{Account:[username],resultsLimit:limit}}})
+});
     const run1Data=await run1.json();
     const runId1=run1Data.data?.id;
     if(!runId1){document.getElementById('apify-status').textContent='Erro no Actor 1. Verifique o token do Apify.';return;}
