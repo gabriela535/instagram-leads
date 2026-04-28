@@ -380,6 +380,7 @@ async function runApify() {
     await waitForRun(runId2);
 
     const profiles = await callApify('getResults', {runId: runId2});
+console.log('Profiles recebidos:', profiles.length, JSON.stringify(profiles[0]));
 
     let saved = 0;
     for (const item of profiles) {
