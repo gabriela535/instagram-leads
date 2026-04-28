@@ -395,7 +395,7 @@ async function runApify(){
   
   try{
     // ACTOR 1: Pega lista de seguidores (sem cookies)
-    const run1=await fetch(`https://api.apify.com/v2/acts/scraping_solutions~instagram-scraper-followers-following-no-cookies/runs?token=${window.APIFY_TOKEN}`,{
+    const run1=await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'startRun',payload:{actorId:'scraping_solutions~instagram-scraper-followers-following-no-cookies',input:{Account:[username],resultsLimit:limit}}})});
       method:'POST',
       headers:{'Content-Type':'application/json'},
      body:JSON.stringify({Account:[username],resultsLimit:limit})
@@ -409,7 +409,7 @@ async function runApify(){
     await waitForRun(runId1);
     
     // Pega resultados do Actor 1
-    const res1=await fetch(`https://api.apify.com/v2/actor-runs/${runId1}/dataset/items?token=${window.APIFY_TOKEN}`);
+    const res1=await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'getResults',payload:{runId:runId1}})});
     const followers=await res1.json();
     if(!followers.length){document.getElementById('apify-status').textContent='Nenhum seguidor encontrado.';return;}
     
@@ -428,8 +428,7 @@ async function runApify(){
     document.getElementById('apify-status').textContent=`Passo 2/3: ${newUsernames.length} leads novos encontrados. Buscando bios...`;
     
     // ACTOR 2: Pega bio de cada username novo
-    const run2=await fetch(`https://api.apify.com/v2/acts/datadoping~instagram-followers-scraper-with-details/runs?token=${window.APIFY_TOKEN}`,{
-      method:'POST',
+const run2=await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'startRun',payload:{actorId:'datadoping~instagram-profile-scraper',input:{usernames:newUsernames}}})});      method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({usernames:newUsernames})
     });
@@ -475,8 +474,7 @@ async function waitForRun(runId){
   while(true){
     await new Promise(r=>setTimeout(r,5000));
     const res=await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${window.APIFY_TOKEN}`);
-    const data=await res.json();
-    const status=data.data?.status;
+const res=await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'getStatus',payload:{runId}})});    const status=data.data?.status;
     if(status==='SUCCEEDED'||status==='FAILED'||status==='ABORTED')return status;
   }
 }
