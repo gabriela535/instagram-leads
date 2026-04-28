@@ -398,7 +398,7 @@ async function runApify(){
     const run1=await fetch(`https://api.apify.com/v2/acts/scraping_solutions~instagram-scraper-followers-following-no-cookies/runs?token=${window.APIFY_TOKEN}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({account:[username],maxItems:limit,scrapeType:'Followers'})
+     body:JSON.stringify({Account:[username],resultsLimit:limit})
     });
     const run1Data=await run1.json();
     const runId1=run1Data.data?.id;
