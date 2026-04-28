@@ -389,8 +389,8 @@ console.log('Profiles recebidos:', profiles.length, JSON.stringify(profiles[0]))
         full_name: item.fullName || item.full_name || '',
         bio: item.biography || item.bio || '',
         followers: item.followersCount || item.followers || 0,
-        following: item.followingCount || item.following || 0,
-        is_open: !item.isPrivate && !item.private,
+        following: item.followsCount || item.followingCount || item.following || 0,
+        is_open: item.private === false,
         has_link: !!(item.externalUrl || item.url || item.website || item.externalUrls),
 link_url: item.externalUrl || item.url || item.website || (item.externalUrls && item.externalUrls[0]) || '',
         is_business: item.isBusinessAccount || false,
@@ -398,7 +398,8 @@ link_url: item.externalUrl || item.url || item.website || (item.externalUrls && 
         score: 0
       };
       if (!lead.username) continue;
-      await sb.from('leads').upsert(lead, {onConflict: 'username'});
+      const {error} = await sb.from('leads').upsert(lead, {onConflict: 'username'});
+if (error) { document.getElementById('apify-status').textContent = 'Erro: ' + error.message; return; }
       saved++;
     }
 
