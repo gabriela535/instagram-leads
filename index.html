@@ -390,8 +390,8 @@ async function runApify() {
         followers: item.followersCount || item.followers || 0,
         following: item.followingCount || item.following || 0,
         is_open: !item.isPrivate && !item.private,
-        has_link: !!(item.externalUrl || item.url || item.website),
-        link_url: item.externalUrl || item.url || item.website || '',
+        has_link: !!(item.externalUrl || item.url || item.website || item.externalUrls),
+link_url: item.externalUrl || item.url || item.website || (item.externalUrls && item.externalUrls[0]) || '',
         is_business: item.isBusinessAccount || false,
         fonte: username,
         score: 0
