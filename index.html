@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Instagram Lead Qualifier - v2</title>
+<title>Instagram Lead Qualifier</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 body{background:#f5f5f5;color:#1a1a1a}
-.header{background:#fff;border-bottom:1px solid #e5e5e5;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.header{background:#fff;border-bottom:1px solid #e5e5e5;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
 .logo-icon{width:28px;height:28px;background:#E1306C;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
 .main{padding:24px;max-width:1200px;margin:0 auto}
@@ -19,8 +19,8 @@ body{background:#f5f5f5;color:#1a1a1a}
 .card{background:#fff;border-radius:10px;border:1px solid #e5e5e5;padding:16px;margin-bottom:16px}
 .card-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
 .score-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.rule{padding:10px 12px;border-radius:8px;border:1px solid transparent}
-.rule-green{background:#eaf3de;border-color:#c0dd97}.rule-amber{background:#faeeda;border-color:#fac775}.rule-red{background:#fcebeb;border-color:#f7c1c1}
+.rule{padding:10px 12px;border-radius:8px}
+.rule-green{background:#eaf3de}.rule-amber{background:#faeeda}.rule-red{background:#fcebeb}
 .rule-title{font-size:11px;font-weight:600;margin-bottom:2px}
 .rule-green .rule-title{color:#3b6d11}.rule-amber .rule-title{color:#854f0b}.rule-red .rule-title{color:#a32d2d}
 .rule-pts{font-size:17px;font-weight:700}
@@ -31,15 +31,15 @@ body{background:#f5f5f5;color:#1a1a1a}
 .kw-add{display:flex;gap:6px;margin-top:6px}
 .kw-add input{font-size:12px;padding:5px 10px;border:1px solid #ddd;border-radius:20px;width:160px}
 .kw-add button{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid #ddd;background:#fff;cursor:pointer}
-.filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
 .filters label{font-size:13px;color:#666}
 .filters input,.filters select{font-size:13px;padding:6px 10px;border:1px solid #ddd;border-radius:8px}
-.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.btn{font-size:13px;padding:7px 14px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;display:flex;align-items:center;gap:6px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.btn{font-size:13px;padding:7px 14px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
 .btn:hover{background:#f5f5f5}
 .btn-pink{background:#E1306C;color:#fff;border-color:#E1306C}
 .btn-pink:hover{background:#c0235a}
-.btn-apify{background:#ff7b00;color:#fff;border-color:#ff7b00}
+.btn-apify{background:#ff7b00;color:#fff;border-color:#ff7b00;font-size:13px;padding:7px 14px;border-radius:8px;cursor:pointer;border:none}
 .btn-apify:hover{background:#e06d00}
 .table{background:#fff;border-radius:10px;border:1px solid #e5e5e5;overflow:hidden}
 .table-header{display:grid;grid-template-columns:36px 200px 100px 80px 110px 1fr 120px;gap:8px;padding:10px 16px;background:#f9f9f9;font-size:12px;font-weight:600;color:#888;border-bottom:1px solid #e5e5e5}
@@ -58,7 +58,6 @@ body{background:#f5f5f5;color:#1a1a1a}
 .score-num{font-size:13px;font-weight:700;min-width:26px;text-align:right}
 .bio-cell{font-size:12px;color:#666;line-height:1.4}
 .btn-analyze{font-size:11px;padding:3px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#666}
-.btn-analyze:hover{background:#f5f5f5}
 .btn-direct{font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
 .btn-direct:hover{background:#E1306C;color:#fff;border-color:#E1306C}
 .dots{display:inline-flex;gap:3px}
@@ -76,7 +75,7 @@ body{background:#f5f5f5;color:#1a1a1a}
 .modal-footer{display:flex;justify-content:space-between;margin-top:12px;gap:8px}
 .hidden{display:none}
 .success{font-size:13px;color:#3b6d11;background:#eaf3de;padding:10px;border-radius:8px;text-align:center;margin-top:10px}
-.apify-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99}
+.apify-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99}
 .apify-box{background:#fff;border-radius:12px;padding:24px;width:460px;max-width:95vw}
 .apify-box h2{font-size:16px;font-weight:600;margin-bottom:6px}
 .apify-box p{font-size:13px;color:#666;margin-bottom:14px}
@@ -91,7 +90,7 @@ body{background:#f5f5f5;color:#1a1a1a}
 <div class="header">
   <div class="logo"><div class="logo-icon">IG</div> Instagram Lead Qualifier</div>
   <div style="display:flex;gap:8px">
-    <button class="btn btn-apify" onclick="openApify()">Buscar leads no Instagram</button>
+    <button class="btn-apify" onclick="openApify()">Buscar leads no Instagram</button>
     <button class="btn" onclick="requalify()">Re-qualificar</button>
   </div>
 </div>
@@ -111,22 +110,27 @@ body{background:#f5f5f5;color:#1a1a1a}
       <div class="rule rule-amber"><div class="rule-title">Aberto sem link</div><div class="rule-pts">+15 pts</div></div>
       <div class="rule rule-red"><div class="rule-title">Perfil fechado</div><div class="rule-pts">+5 pts</div></div>
     </div>
-    <div style="margin-bottom:6px;font-size:11px;font-weight:600;color:#888;letter-spacing:.05em">HOT +25pts</div>
+    <div style="font-size:11px;font-weight:600;color:#888;letter-spacing:.05em;margin-bottom:6px">HOT +25pts</div>
     <div class="kw-row" id="kw-hot"></div>
     <div class="kw-add"><input id="new-hot" placeholder="Nova keyword HOT..." onkeydown="if(event.key==='Enter')addKw('hot')"><button onclick="addKw('hot')">+ Adicionar</button></div>
-    <div style="margin:10px 0 6px;font-size:11px;font-weight:600;color:#888;letter-spacing:.05em">WARM +10pts</div>
+    <div style="font-size:11px;font-weight:600;color:#888;letter-spacing:.05em;margin:10px 0 6px">WARM +10pts</div>
     <div class="kw-row" id="kw-warm"></div>
     <div class="kw-add"><input id="new-warm" placeholder="Nova keyword WARM..." onkeydown="if(event.key==='Enter')addKw('warm')"><button onclick="addKw('warm')">+ Adicionar</button></div>
-    <div style="margin:12px 0 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <label style="font-size:13px;color:#666">Score mínimo</label>
-      <input type="number" id="score-min" value="25" min="0" max="100" style="width:65px;padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:8px" oninput="renderLeads()">
-      <label style="font-size:13px;color:#666">Perfil</label>
-      <select id="filter-type" onchange="renderLeads()" style="padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:8px">
-        <option value="all">Todos</option><option value="open">Aberto</option><option value="link">Aberto + link</option><option value="closed">Fechado</option>
+    <div class="filters">
+      <label>Score mínimo</label>
+      <input type="number" id="score-min" value="25" min="0" max="100" style="width:65px" oninput="renderLeads()">
+      <label>Perfil</label>
+      <select id="filter-type" onchange="renderLeads()">
+        <option value="all">Todos</option>
+        <option value="open">Aberto</option>
+        <option value="link">Aberto + link</option>
+        <option value="closed">Fechado</option>
       </select>
-      <label style="font-size:13px;color:#666">Ordenar</label>
-      <select id="sort-by" onchange="renderLeads()" style="padding:5px 8px;font-size:13px;border:1px solid #ddd;border-radius:8px">
-        <option value="score">Score</option><option value="name">Nome</option><option value="followers">Seguidores</option>
+      <label>Ordenar</label>
+      <select id="sort-by" onchange="renderLeads()">
+        <option value="score">Score</option>
+        <option value="name">Nome</option>
+        <option value="followers">Seguidores</option>
       </select>
     </div>
   </div>
@@ -166,18 +170,18 @@ body{background:#f5f5f5;color:#1a1a1a}
 </div>
 
 <!-- Modal Apify -->
-<div id="apify-modal" class="apify-modal hidden" <div id="apify-modal" class="apify-modal hidden">
+<div id="apify-modal" class="apify-overlay hidden">
   <div class="apify-box">
     <h2>Buscar leads no Instagram</h2>
-    <p>Digite o @ de uma conta do Instagram (ex: um concorrente ou parceiro) e vamos buscar os seguidores dela como leads.</p>
-    <label>Perfil do Instagram para buscar seguidores</label>
-    <input id="apify-username" placeholder="ex: lojaexemplo (sem o @)">
+    <p>Digite o @ de uma conta do Instagram e vamos buscar os seguidores dela como leads.</p>
+    <label>Perfil do Instagram (sem o @)</label>
+    <input id="apify-username" placeholder="ex: kiwify">
     <label>Quantidade máxima de leads</label>
     <input id="apify-limit" type="number" value="100" min="10" max="500">
     <div id="apify-status" style="font-size:13px;color:#666;margin-bottom:10px;min-height:18px"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn" onclick="closeApify()">Cancelar</button>
-      <button class="btn btn-apify" onclick="runApify()">Buscar leads</button>
+      <button class="btn-apify" onclick="runApify()">Buscar leads</button>
     </div>
   </div>
 </div>
@@ -187,87 +191,95 @@ const SUPABASE_URL = 'https://imrsllqxvwizrukyymfd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_p0bKFOsPrA0v266Nqb6Ipg_K5rrAeAR';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let hotKws=['gateway','checkout','ecommerce','payment','loja virtual','vendas online'];
-let warmKws=['negócios','mei','cnpj','empresa','empresário','microempreendedor'];
-const COLORS=['#E1306C','#405DE6','#833AB4','#FCAF45','#F77737','#5851DB'];
-const bioCache={};
-let currentLead=null;
-let allLeads=[];
+let hotKws = ['gateway','checkout','ecommerce','payment','loja virtual','vendas online'];
+let warmKws = ['negócios','mei','cnpj','empresa','empresário','microempreendedor'];
+const COLORS = ['#E1306C','#405DE6','#833AB4','#FCAF45','#F77737','#5851DB'];
+const bioCache = {};
+let currentLead = null;
+let allLeads = [];
+window.ANTHROPIC_KEY = '';
 
-async function loadLeads(){
-  const{data}=await sb.from('leads').select('*').order('score',{ascending:false});
-  allLeads=data||[];
+async function loadLeads() {
+  const {data} = await sb.from('leads').select('*').order('score', {ascending:false});
+  allLeads = data || [];
   renderLeads();
 }
 
-function calcScore(lead){
-  let score=0,breakdown=[];
-  if(lead.is_open&&lead.has_link){score+=40;breakdown.push({pts:'+40',desc:'Aberto + link'});}
-  else if(lead.is_open){score+=15;breakdown.push({pts:'+15',desc:'Aberto sem link'});}
-  else{score+=5;breakdown.push({pts:'+5',desc:'Perfil fechado'});}
-  const bio=(lead.bio||'').toLowerCase();
-  hotKws.forEach(k=>{if(bio.includes(k)){score+=25;breakdown.push({pts:'+25',desc:`HOT: "${k}"`});}});
-  warmKws.forEach(k=>{if(bio.includes(k)){score+=10;breakdown.push({pts:'+10',desc:`WARM: "${k}"`});}});
-  return{score:Math.max(0,Math.min(100,score)),breakdown};
+function calcScore(lead) {
+  let score = 0, breakdown = [];
+  if (lead.is_open && lead.has_link) { score += 40; breakdown.push({pts:'+40',desc:'Aberto + link'}); }
+  else if (lead.is_open) { score += 15; breakdown.push({pts:'+15',desc:'Aberto sem link'}); }
+  else { score += 5; breakdown.push({pts:'+5',desc:'Perfil fechado'}); }
+  const bio = (lead.bio || '').toLowerCase();
+  hotKws.forEach(k => { if (bio.includes(k)) { score += 25; breakdown.push({pts:'+25',desc:'HOT: '+k}); }});
+  warmKws.forEach(k => { if (bio.includes(k)) { score += 10; breakdown.push({pts:'+10',desc:'WARM: '+k}); }});
+  return {score: Math.max(0, Math.min(100, score)), breakdown};
 }
 
-function scoreColor(s){return s>=70?'#D85A30':s>=40?'#BA7517':'#999';}
+function scoreColor(s) { return s>=70?'#D85A30':s>=40?'#BA7517':'#999'; }
 
-function renderKw(){
-  ['hot','warm'].forEach(type=>{
-    const list=type==='hot'?hotKws:warmKws;
-    const el=document.getElementById('kw-'+type);
-    el.innerHTML='';
-    list.forEach((k,i)=>{
-      const b=document.createElement('span');
-      b.className='kw-badge kw-'+type;
-      b.innerHTML=k+` <span style="opacity:.7;cursor:pointer" onclick="removeKw('${type}',${i},event)">×</span>`;
+function renderKw() {
+  ['hot','warm'].forEach(type => {
+    const list = type==='hot' ? hotKws : warmKws;
+    const el = document.getElementById('kw-'+type);
+    el.innerHTML = '';
+    list.forEach((k,i) => {
+      const b = document.createElement('span');
+      b.className = 'kw-badge kw-'+type;
+      b.innerHTML = k + ' <span style="opacity:.7;cursor:pointer" onclick="removeKw(\''+type+'\','+i+',event)">×</span>';
       el.appendChild(b);
     });
   });
 }
 
-function addKw(type){
-  const inp=document.getElementById('new-'+type);
-  const val=inp.value.trim().toLowerCase();
-  if(!val)return;
-  if(type==='hot'&&!hotKws.includes(val))hotKws.push(val);
-  if(type==='warm'&&!warmKws.includes(val))warmKws.push(val);
-  inp.value='';renderKw();renderLeads();
+function addKw(type) {
+  const inp = document.getElementById('new-'+type);
+  const val = inp.value.trim().toLowerCase();
+  if (!val) return;
+  if (type==='hot' && !hotKws.includes(val)) hotKws.push(val);
+  if (type==='warm' && !warmKws.includes(val)) warmKws.push(val);
+  inp.value = '';
+  renderKw();
+  renderLeads();
 }
 
-function removeKw(type,i,e){
+function removeKw(type, i, e) {
   e.stopPropagation();
-  if(type==='hot')hotKws.splice(i,1);else warmKws.splice(i,1);
-  renderKw();renderLeads();
+  if (type==='hot') hotKws.splice(i,1);
+  else warmKws.splice(i,1);
+  renderKw();
+  renderLeads();
 }
 
-function renderLeads(){
-  const minScore=parseInt(document.getElementById('score-min').value)||0;
-  const filterType=document.getElementById('filter-type').value;
-  const sortBy=document.getElementById('sort-by').value;
-  let leads=allLeads.map((l,i)=>({...l,color:COLORS[i%COLORS.length],...calcScore(l)}));
-  leads=leads.filter(l=>l.score>=minScore);
-  if(filterType==='open')leads=leads.filter(l=>l.is_open);
-  if(filterType==='link')leads=leads.filter(l=>l.is_open&&l.has_link);
-  if(filterType==='closed')leads=leads.filter(l=>!l.is_open);
-  if(sortBy==='score')leads.sort((a,b)=>b.score-a.score);
-  if(sortBy==='name')leads.sort((a,b)=>(a.full_name||'').localeCompare(b.full_name||''));
-  if(sortBy==='followers')leads.sort((a,b)=>(b.followers||0)-(a.followers||0));
-  document.getElementById('s-total').textContent=leads.length;
-  document.getElementById('s-high').textContent=leads.filter(l=>l.score>=70).length;
-  document.getElementById('s-linkopen').textContent=leads.filter(l=>l.is_open&&l.has_link).length;
-  document.getElementById('s-qual').textContent=leads.filter(l=>l.score>=40).length;
-  const body=document.getElementById('leads-body');
-  body.innerHTML='';
-  if(leads.length===0){body.innerHTML='<div style="padding:40px;text-align:center;color:#999">Nenhum lead encontrado. Clique em "Buscar leads no Instagram" para começar!</div>';return;}
-  leads.forEach(l=>{
-    const sc=scoreColor(l.score);
-    const initials=(l.full_name||l.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-    const bioContent=l.bio_summary?`<span>${l.bio_summary}</span>`:`<button class="btn-analyze" onclick="analyzeSingle('${l.id}',this.parentElement)">Analisar com IA</button>`;
-    const row=document.createElement('div');
-    row.className='lead-row';
-    row.innerHTML=`
+function renderLeads() {
+  const minScore = parseInt(document.getElementById('score-min').value) || 0;
+  const filterType = document.getElementById('filter-type').value;
+  const sortBy = document.getElementById('sort-by').value;
+  let leads = allLeads.map((l,i) => ({...l, color:COLORS[i%COLORS.length], ...calcScore(l)}));
+  leads = leads.filter(l => l.score >= minScore);
+  if (filterType==='open') leads = leads.filter(l => l.is_open);
+  if (filterType==='link') leads = leads.filter(l => l.is_open && l.has_link);
+  if (filterType==='closed') leads = leads.filter(l => !l.is_open);
+  if (sortBy==='score') leads.sort((a,b) => b.score-a.score);
+  if (sortBy==='name') leads.sort((a,b) => (a.full_name||'').localeCompare(b.full_name||''));
+  if (sortBy==='followers') leads.sort((a,b) => (b.followers||0)-(a.followers||0));
+  document.getElementById('s-total').textContent = leads.length;
+  document.getElementById('s-high').textContent = leads.filter(l=>l.score>=70).length;
+  document.getElementById('s-linkopen').textContent = leads.filter(l=>l.is_open&&l.has_link).length;
+  document.getElementById('s-qual').textContent = leads.filter(l=>l.score>=40).length;
+  const body = document.getElementById('leads-body');
+  body.innerHTML = '';
+  if (leads.length === 0) {
+    body.innerHTML = '<div style="padding:40px;text-align:center;color:#999">Nenhum lead. Clique em "Buscar leads no Instagram" para começar!</div>';
+    return;
+  }
+  leads.forEach(l => {
+    const sc = scoreColor(l.score);
+    const initials = (l.full_name||l.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const bioContent = l.bio_summary ? l.bio_summary : '<button class="btn-analyze" onclick="analyzeSingle(\''+l.id+'\',this.parentElement)">Analisar com IA</button>';
+    const row = document.createElement('div');
+    row.className = 'lead-row';
+    row.innerHTML = `
       <div class="avatar" style="background:${l.color}22;color:${l.color}">${initials}</div>
       <div><div class="lead-name">${l.full_name||l.username}</div><div class="lead-handle">@${l.username}</div></div>
       <div style="display:flex;gap:3px;flex-wrap:wrap">
@@ -282,213 +294,234 @@ function renderLeads(){
   });
 }
 
-async function fetchBio(lead){
-  if(bioCache[lead.id])return bioCache[lead.id];
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:`Analise esta bio do Instagram e responda em UMA linha curta (máx 12 palavras) em português: qual é o negócio ou perfil desta pessoa? Bio: "${lead.bio}". Responda APENAS com a descrição.`}]})
+async function callApify(action, payload) {
+  const res = await fetch('/api/apify', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({action, payload})
   });
-  const data=await res.json();
-  const txt=data.content?.find(c=>c.type==='text')?.text||'Não foi possível analisar';
-  bioCache[lead.id]=txt;
-  await sb.from('leads').update({bio_summary:txt}).eq('id',lead.id);
+  return res.json();
+}
+
+async function waitForRun(runId) {
+  while (true) {
+    await new Promise(r => setTimeout(r, 5000));
+    const data = await callApify('getStatus', {runId});
+    const status = data.data && data.data.status;
+    if (status==='SUCCEEDED' || status==='FAILED' || status==='ABORTED') return status;
+  }
+}
+
+function openApify() {
+  document.getElementById('apify-status').textContent = '';
+  document.getElementById('apify-modal').classList.remove('hidden');
+}
+
+function closeApify() {
+  document.getElementById('apify-modal').classList.add('hidden');
+}
+
+async function runApify() {
+  const username = document.getElementById('apify-username').value.trim().replace('@','');
+  const limit = parseInt(document.getElementById('apify-limit').value) || 100;
+  if (!username) { alert('Digite um username!'); return; }
+
+  document.getElementById('apify-status').textContent = 'Passo 1/3: Buscando seguidores...';
+
+  try {
+    // ACTOR 1: Pega lista de seguidores
+    const run1Data = await callApify('startRun', {
+      actorId: 'scraping_solutions~instagram-scraper-followers-following-no-cookies',
+      input: {Account: [username], resultsLimit: limit}
+    });
+
+    const runId1 = run1Data.data && run1Data.data.id;
+    if (!runId1) {
+      document.getElementById('apify-status').textContent = 'Erro no Actor 1: ' + JSON.stringify(run1Data);
+      return;
+    }
+
+    document.getElementById('apify-status').textContent = 'Passo 1/3: Aguardando seguidores... (1-2 min)';
+    await waitForRun(runId1);
+
+    const followers = await callApify('getResults', {runId: runId1});
+    if (!followers.length) {
+      document.getElementById('apify-status').textContent = 'Nenhum seguidor encontrado.';
+      return;
+    }
+
+    // Filtra só os novos
+    document.getElementById('apify-status').textContent = 'Passo 2/3: Verificando leads novos...';
+    const usernames = followers.map(f => f.username || f.userName).filter(Boolean);
+    const {data: existing} = await sb.from('leads').select('username').in('username', usernames);
+    const existingSet = new Set((existing||[]).map(e => e.username));
+    const newUsernames = usernames.filter(u => !existingSet.has(u));
+
+    if (!newUsernames.length) {
+      document.getElementById('apify-status').textContent = 'Todos os seguidores já estão no banco!';
+      return;
+    }
+
+    document.getElementById('apify-status').textContent = 'Passo 2/3: ' + newUsernames.length + ' leads novos. Buscando bios...';
+
+    // ACTOR 2: Pega bio de cada username novo
+    const run2Data = await callApify('startRun', {
+      actorId: 'datadoping~instagram-profile-scraper',
+      input: {usernames: newUsernames}
+    });
+
+    const runId2 = run2Data.data && run2Data.data.id;
+    if (!runId2) {
+      document.getElementById('apify-status').textContent = 'Erro no Actor 2: ' + JSON.stringify(run2Data);
+      return;
+    }
+
+    document.getElementById('apify-status').textContent = 'Passo 3/3: Buscando bios...';
+    await waitForRun(runId2);
+
+    const profiles = await callApify('getResults', {runId: runId2});
+
+    let saved = 0;
+    for (const item of profiles) {
+      const lead = {
+        username: item.username || '',
+        full_name: item.fullName || item.full_name || '',
+        bio: item.biography || item.bio || '',
+        followers: item.followersCount || item.followers || 0,
+        following: item.followingCount || item.following || 0,
+        is_open: !item.isPrivate,
+        has_link: !!(item.externalUrl || item.url || item.website),
+        link_url: item.externalUrl || item.url || item.website || '',
+        is_business: item.isBusinessAccount || false,
+        fonte: username,
+        score: 0
+      };
+      if (!lead.username) continue;
+      await sb.from('leads').upsert(lead, {onConflict: 'username'});
+      saved++;
+    }
+
+    document.getElementById('apify-status').textContent = '✓ ' + saved + ' leads novos! (' + existingSet.size + ' já existiam)';
+    setTimeout(() => { closeApify(); loadLeads(); }, 2000);
+
+  } catch(e) {
+    document.getElementById('apify-status').textContent = 'Erro: ' + e.message;
+  }
+}
+
+async function fetchBio(lead) {
+  if (bioCache[lead.id]) return bioCache[lead.id];
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
+    body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:'Analise esta bio do Instagram e responda em UMA linha curta (máx 12 palavras) em português: qual é o negócio ou perfil desta pessoa? Bio: "'+lead.bio+'". Responda APENAS com a descrição.'}]})
+  });
+  const data = await res.json();
+  const txt = (data.content && data.content.find(c=>c.type==='text') && data.content.find(c=>c.type==='text').text) || 'Não foi possível analisar';
+  bioCache[lead.id] = txt;
+  await sb.from('leads').update({bio_summary:txt}).eq('id', lead.id);
   return txt;
 }
 
-async function analyzeSingle(id,cellEl){
-  const lead=allLeads.find(l=>l.id===id);
-  if(!lead)return;
-  cellEl.innerHTML=`<span class="dots"><span></span><span></span><span></span></span>`;
-  const txt=await fetchBio(lead).catch(()=>'Erro na análise');
-  cellEl.innerHTML=txt;
-  const idx=allLeads.findIndex(l=>l.id===id);
-  if(idx>=0)allLeads[idx].bio_summary=txt;
+async function analyzeSingle(id, cellEl) {
+  const lead = allLeads.find(l => l.id===id);
+  if (!lead) return;
+  cellEl.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+  const txt = await fetchBio(lead).catch(() => 'Erro na análise');
+  cellEl.innerHTML = txt;
+  const idx = allLeads.findIndex(l => l.id===id);
+  if (idx>=0) allLeads[idx].bio_summary = txt;
 }
 
-async function analyzeAll(){
-  const btn=document.getElementById('btn-all');
-  btn.disabled=true;btn.textContent='Analisando...';
-  const pending=allLeads.filter(l=>!l.bio_summary&&l.bio);
-  let done=0;
-  for(let i=0;i<pending.length;i+=3){
-    const batch=pending.slice(i,i+3);
-    await Promise.all(batch.map(async lead=>{
-      const cell=document.getElementById('bio-'+lead.id);
-      if(cell)cell.innerHTML=`<span class="dots"><span></span><span></span><span></span></span>`;
-      const txt=await fetchBio(lead).catch(()=>'Erro');
-      if(cell)cell.innerHTML=txt;
-      const idx=allLeads.findIndex(l=>l.id===lead.id);
-      if(idx>=0)allLeads[idx].bio_summary=txt;
+async function analyzeAll() {
+  const btn = document.getElementById('btn-all');
+  btn.disabled = true;
+  btn.textContent = 'Analisando...';
+  const pending = allLeads.filter(l => !l.bio_summary && l.bio);
+  let done = 0;
+  for (let i=0; i<pending.length; i+=3) {
+    const batch = pending.slice(i, i+3);
+    await Promise.all(batch.map(async lead => {
+      const cell = document.getElementById('bio-'+lead.id);
+      if (cell) cell.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+      const txt = await fetchBio(lead).catch(() => 'Erro');
+      if (cell) cell.innerHTML = txt;
+      const idx = allLeads.findIndex(l => l.id===lead.id);
+      if (idx>=0) allLeads[idx].bio_summary = txt;
       done++;
-      document.getElementById('analyze-status').textContent=`Analisando ${done} de ${pending.length}...`;
+      document.getElementById('analyze-status').textContent = 'Analisando ' + done + ' de ' + pending.length + '...';
     }));
   }
-  document.getElementById('analyze-status').textContent=`✓ ${allLeads.length} perfis analisados`;
-  btn.disabled=false;btn.textContent='Analisar todos com IA';
+  document.getElementById('analyze-status').textContent = '✓ ' + allLeads.length + ' perfis analisados';
+  btn.disabled = false;
+  btn.textContent = 'Analisar todos com IA';
 }
 
-function requalify(){
-  const bar=document.getElementById('progress');
-  let p=0;bar.style.width='0%';
-  const iv=setInterval(()=>{p+=15;if(p>=100){p=100;clearInterval(iv);setTimeout(()=>bar.style.width='0%',500);}bar.style.width=p+'%';},80);
+function requalify() {
+  const bar = document.getElementById('progress');
+  let p = 0; bar.style.width = '0%';
+  const iv = setInterval(() => { p+=15; if(p>=100){p=100;clearInterval(iv);setTimeout(()=>bar.style.width='0%',500);} bar.style.width=p+'%'; }, 80);
   renderLeads();
 }
 
-function openDirect(id){
-  currentLead=allLeads.find(l=>l.id===id);
-  if(!currentLead)return;
-  const{score,breakdown}=calcScore(currentLead);
-  const color=COLORS[allLeads.indexOf(currentLead)%COLORS.length];
-  const initials=(currentLead.full_name||currentLead.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  document.getElementById('modal-user').innerHTML=`
+function openDirect(id) {
+  currentLead = allLeads.find(l => l.id===id);
+  if (!currentLead) return;
+  const {score, breakdown} = calcScore(currentLead);
+  const color = COLORS[allLeads.indexOf(currentLead)%COLORS.length];
+  const initials = (currentLead.full_name||currentLead.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('modal-user').innerHTML = `
     <div class="avatar" style="width:38px;height:38px;background:${color}22;color:${color}">${initials}</div>
     <div><div style="font-weight:600;font-size:14px">${currentLead.full_name||currentLead.username}</div>
-    <div style="font-size:12px;color:#888">@${currentLead.username} · ${currentLead.is_open?'Aberto':'Fechado'}${currentLead.has_link?' · Link':''}</div></div>
+    <div style="font-size:12px;color:#888">@${currentLead.username}</div></div>
     <div style="margin-left:auto;font-size:22px;font-weight:700;color:${scoreColor(score)}">${score}</div>`;
-  document.getElementById('modal-breakdown').innerHTML='<b>Score:</b> '+breakdown.map(b=>`<span style="color:${b.pts.startsWith('+')?'#3b6d11':'#a32d2d'}">${b.pts}</span> ${b.desc}`).join(' · ');
-  document.getElementById('msg-text').value='';
-  document.getElementById('modal-status').textContent='';
+  document.getElementById('modal-breakdown').innerHTML = '<b>Score:</b> ' + breakdown.map(b=>`<span style="color:${b.pts.startsWith('+')?'#3b6d11':'#a32d2d'}">${b.pts}</span> ${b.desc}`).join(' · ');
+  document.getElementById('msg-text').value = '';
+  document.getElementById('modal-status').textContent = '';
   document.getElementById('sent-ok').classList.add('hidden');
   document.getElementById('modal').classList.remove('hidden');
 }
 
-function closeModal(){document.getElementById('modal').classList.add('hidden');currentLead=null;}
-
-async function generateMsg(){
-  if(!currentLead)return;
-  document.getElementById('modal-status').textContent='Gerando mensagem...';
-  document.getElementById('msg-text').value='';
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:`Crie uma mensagem curta de prospecção para Instagram Direct (máximo 3 linhas, tom natural) para "${currentLead.full_name||currentLead.username}" (@${currentLead.username}). Bio: "${currentLead.bio||'sem bio'}". Perfil ${currentLead.is_open?'aberto':'fechado'}${currentLead.has_link?', tem link na bio':''}. Ofereço soluções de pagamento e ecommerce. Responda APENAS com o texto da mensagem.`}]})
-    });
-    const data=await res.json();
-    const txt=data.content?.find(c=>c.type==='text')?.text||'Oi! Vi seu perfil e me interessei pelo que você faz. Tenho uma solução que pode ajudar muito suas vendas. Posso te contar mais?';
-    document.getElementById('msg-text').value=txt;
-    document.getElementById('modal-status').textContent='Pronto! Edite se quiser.';
-    await sb.from('leads').update({direct_message:txt}).eq('id',currentLead.id);
-  }catch(e){document.getElementById('modal-status').textContent='Erro — tente novamente';}
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+  currentLead = null;
 }
 
-async function sendDirect(){
-  const msg=document.getElementById('msg-text').value.trim();
-  if(!msg||!currentLead)return;
+async function generateMsg() {
+  if (!currentLead) return;
+  document.getElementById('modal-status').textContent = 'Gerando mensagem...';
+  document.getElementById('msg-text').value = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:'Crie uma mensagem curta de prospecção para Instagram Direct (máximo 3 linhas, tom natural) para "'+( currentLead.full_name||currentLead.username)+'" (@'+currentLead.username+'). Bio: "'+( currentLead.bio||'sem bio')+'". Perfil '+(currentLead.is_open?'aberto':'fechado')+(currentLead.has_link?', tem link na bio':'')+'. Ofereço soluções de pagamento e ecommerce. Responda APENAS com o texto da mensagem.'}]})
+    });
+    const data = await res.json();
+    const txt = (data.content && data.content.find(c=>c.type==='text') && data.content.find(c=>c.type==='text').text) || 'Oi! Vi seu perfil e me interessei pelo que você faz. Tenho uma solução que pode ajudar muito suas vendas. Posso te contar mais?';
+    document.getElementById('msg-text').value = txt;
+    document.getElementById('modal-status').textContent = 'Pronto! Edite se quiser.';
+  } catch(e) {
+    document.getElementById('modal-status').textContent = 'Erro — tente novamente';
+  }
+}
+
+async function sendDirect() {
+  const msg = document.getElementById('msg-text').value.trim();
+  if (!msg || !currentLead) return;
   navigator.clipboard.writeText(msg).catch(()=>{});
-  window.open(`https://ig.me/m/${currentLead.username}`,'_blank');
-  await sb.from('leads').update({direct_sent:true}).eq('id',currentLead.id);
+  window.open('https://ig.me/m/'+currentLead.username, '_blank');
+  await sb.from('leads').update({direct_sent:true}).eq('id', currentLead.id);
   document.getElementById('sent-ok').classList.remove('hidden');
-  setTimeout(()=>closeModal(),2000);
+  setTimeout(() => closeModal(), 2000);
 }
 
-function openApify(){document.getElementById('apify-modal').classList.remove('hidden');}
-function closeApify(){document.getElementById('apify-modal').classList.add('hidden');}
-
-async function runApify(){
-  const username=document.getElementById('apify-username').value.trim();
-  const limit=parseInt(document.getElementById('apify-limit').value)||100;
-  if(!username){alert('Digite um username!');return;}
-  
-  document.getElementById('apify-status').textContent='Passo 1/3: Buscando seguidores...';
-  
-  try{
-    // ACTOR 1: Pega lista de seguidores (sem cookies)
-    const run1=await fetch('/api/apify',{
-  method:'POST',
-  headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({action:'startRun',payload:{actorId:'scraping_solutions~instagram-scraper-followers-following-no-cookies',input:{Account:[username],resultsLimit:limit}}})
-});
-    const run1Data=await run1.json();
-    const runId1=run1Data.data?.id;
-    if(!runId1){document.getElementById('apify-status').textContent='Erro no Actor 1. Verifique o token do Apify.';return;}
-    
-    // Aguarda Actor 1 terminar
-    document.getElementById('apify-status').textContent='Passo 1/3: Aguardando seguidores... (1-2 min)';
-    await waitForRun(runId1);
-    
-    // Pega resultados do Actor 1
-    const res1=await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'getResults',payload:{runId:runId1}})});
-    const followers=await res1.json();
-    if(!followers.length){document.getElementById('apify-status').textContent='Nenhum seguidor encontrado.';return;}
-    
-    // Filtra usernames que JÁ existem no banco para não cobrar de novo
-    document.getElementById('apify-status').textContent='Passo 2/3: Verificando leads novos...';
-    const usernames=followers.map(f=>f.username||f.userName).filter(Boolean);
-    const{data:existing}=await sb.from('leads').select('username').in('username',usernames);
-    const existingSet=new Set((existing||[]).map(e=>e.username));
-    const newUsernames=usernames.filter(u=>!existingSet.has(u));
-    
-    if(!newUsernames.length){
-      document.getElementById('apify-status').textContent='Todos os seguidores já estão no banco!';
-      return;
-    }
-    
-    document.getElementById('apify-status').textContent=`Passo 2/3: ${newUsernames.length} leads novos encontrados. Buscando bios...`;
-    
-    // ACTOR 2: Pega bio de cada username novo
-const run2=await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'startRun',payload:{actorId:'datadoping~instagram-profile-scraper',input:{usernames:newUsernames}}})});      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({usernames:newUsernames})
-    });
-    const run2Data=await run2.json();
-    const runId2=run2Data.data?.id;
-    if(!runId2){document.getElementById('apify-status').textContent='Erro no Actor 2.';return;}
-    
-    document.getElementById('apify-status').textContent='Passo 3/3: Buscando bios... (pode demorar)';
-    await waitForRun(runId2);
-    
-    // Pega resultados do Actor 2
-    const res2=await fetch(`https://api.apify.com/v2/actor-runs/${runId2}/dataset/items?token=${window.APIFY_TOKEN}`);
-    const profiles=await res2.json();
-    
-    // Salva no banco
-    let saved=0;
-    for(const item of profiles){
-      const lead={
-        username:item.username||'',
-        full_name:item.fullName||item.full_name||'',
-        bio:item.biography||item.bio||'',
-        followers:item.followersCount||item.followers||0,
-        following:item.followingCount||item.following||0,
-        is_open:!item.isPrivate,
-        has_link:!!(item.externalUrl||item.url||item.website),
-        link_url:item.externalUrl||item.url||item.website||'',
-        is_business:item.isBusinessAccount||false,
-        fonte:username,
-        score:0
-      };
-      if(!lead.username)continue;
-      await sb.from('leads').upsert(lead,{onConflict:'username'});
-      saved++;
-    }
-    document.getElementById('apify-status').textContent=`✓ ${saved} leads novos salvos! (${existingSet.size} duplicatas ignoradas)`;
-    setTimeout(()=>{closeApify();loadLeads();},2000);
-  }catch(e){
-    document.getElementById('apify-status').textContent='Erro: '+e.message;
-  }
-}
-
-async function waitForRun(runId){
-  while(true){
-    await new Promise(r=>setTimeout(r,5000));
-    const res=await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${window.APIFY_TOKEN}`);
-const res=await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'getStatus',payload:{runId}})});    const status=data.data?.status;
-    if(status==='SUCCEEDED'||status==='FAILED'||status==='ABORTED')return status;
-  }
-}
-
-window.ANTHROPIC_KEY='';
-window.APIFY_TOKEN='';
-
-async function init(){
-  try{
-    const res=await fetch('/api/config');
-    const cfg=await res.json();
-    window.ANTHROPIC_KEY=cfg.anthropicKey||'';
-    window.APIFY_TOKEN=cfg.apifyToken||'';
-  }catch(e){}
+async function init() {
+  try {
+    const res = await fetch('/api/config');
+    const cfg = await res.json();
+    window.ANTHROPIC_KEY = cfg.anthropicKey || '';
+  } catch(e) {}
   renderKw();
   await loadLeads();
 }
