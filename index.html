@@ -389,7 +389,7 @@ async function runApify() {
         bio: item.biography || item.bio || '',
         followers: item.followersCount || item.followers || 0,
         following: item.followingCount || item.following || 0,
-        is_open: !item.isPrivate,
+        is_open: !item.isPrivate && !item.private,
         has_link: !!(item.externalUrl || item.url || item.website),
         link_url: item.externalUrl || item.url || item.website || '',
         is_business: item.isBusinessAccount || false,
