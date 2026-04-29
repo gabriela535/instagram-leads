@@ -41,6 +41,8 @@ body{background:#f5f5f5;color:#1a1a1a}
 .btn-pink:hover{background:#c0235a}
 .btn-apify{background:#ff7b00;color:#fff;border-color:#ff7b00;font-size:13px;padding:7px 14px;border-radius:8px;cursor:pointer;border:none}
 .btn-apify:hover{background:#e06d00}
+.btn-settings{background:#fff;border:1px solid #ddd;font-size:13px;padding:7px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;color:#555}
+.btn-settings:hover{background:#f5f5f5}
 .table{background:#fff;border-radius:10px;border:1px solid #e5e5e5;overflow:hidden}
 .table-header{display:grid;grid-template-columns:36px 200px 100px 80px 110px 1fr 120px;gap:8px;padding:10px 16px;background:#f9f9f9;font-size:12px;font-weight:600;color:#888;border-bottom:1px solid #e5e5e5}
 .lead-row{display:grid;grid-template-columns:36px 200px 100px 80px 110px 1fr 120px;gap:8px;padding:10px 16px;align-items:center;border-bottom:1px solid #f0f0f0}
@@ -83,13 +85,32 @@ body{background:#f5f5f5;color:#1a1a1a}
 .apify-box label{font-size:13px;color:#666;display:block;margin-bottom:4px}
 .progress{height:4px;background:#f0f0f0;border-radius:2px;overflow:hidden;margin-bottom:16px}
 .progress-fill{height:100%;background:#E1306C;border-radius:2px;transition:width .3s}
+
+/* Settings Modal */
+.settings-box{background:#fff;border-radius:12px;padding:24px;width:500px;max-width:95vw}
+.settings-box h2{font-size:16px;font-weight:600;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.settings-box p{font-size:13px;color:#888;margin-bottom:20px}
+.settings-section{margin-bottom:20px}
+.settings-section-title{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
+.settings-field{margin-bottom:12px}
+.settings-field label{font-size:13px;font-weight:500;color:#444;display:block;margin-bottom:4px}
+.settings-field input,.settings-field textarea{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit}
+.settings-field textarea{min-height:70px;resize:vertical}
+.settings-field .hint{font-size:11px;color:#aaa;margin-top:3px}
+.settings-field a{color:#185fa5;text-decoration:none;font-size:11px}
+.settings-field a:hover{text-decoration:underline}
+.settings-saved{font-size:12px;color:#3b6d11;background:#eaf3de;padding:8px 12px;border-radius:8px;margin-bottom:12px}
+.account-preview{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f5f5f5;border-radius:8px;margin-bottom:12px;font-size:13px}
+.account-dot{width:8px;height:8px;border-radius:50%;background:#ccc}
+.account-dot.connected{background:#3b6d11}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="logo"><div class="logo-icon">IG</div> Instagram Lead Qualifier</div>
-  <div style="display:flex;gap:8px">
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn-settings" onclick="openSettings()">⚙️ Configurações</button>
     <button class="btn-apify" onclick="openApify()">Buscar leads no Instagram</button>
     <button class="btn" onclick="requalify()">Re-qualificar</button>
   </div>
@@ -136,7 +157,6 @@ body{background:#f5f5f5;color:#1a1a1a}
   </div>
 
   <div class="progress"><div class="progress-fill" id="progress" style="width:0%"></div></div>
-
   <div class="toolbar">
     <div style="font-size:13px;color:#666" id="analyze-status"></div>
     <button class="btn" id="btn-all" onclick="analyzeAll()">Analisar todos com IA</button>
@@ -186,6 +206,55 @@ body{background:#f5f5f5;color:#1a1a1a}
   </div>
 </div>
 
+<!-- Modal Configurações -->
+<div id="settings-modal" class="modal hidden">
+  <div class="settings-box">
+    <h2>
+      ⚙️ Configurações
+      <button class="modal-close" onclick="closeSettings()">×</button>
+    </h2>
+    <p>Personalize sua conta e preferências. Salvo localmente no navegador.</p>
+
+    <div id="settings-saved-msg" class="settings-saved hidden">✓ Configurações salvas!</div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">📱 Sua conta do Instagram</div>
+      <div class="settings-field">
+        <label>Seu @ do Instagram (conta que vai prospectar)</label>
+        <input type="text" id="cfg-ig-username" placeholder="ex: meuig" oninput="updateAccountPreview()">
+        <div class="hint">Usado para personalizar a mensagem do Direct e abrir a conversa certa.</div>
+      </div>
+      <div id="account-preview" class="account-preview hidden">
+        <div class="account-dot connected" id="account-dot"></div>
+        <span id="account-preview-text">@</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🎯 Conta padrão para buscar seguidores</div>
+      <div class="settings-field">
+        <label>@ padrão ao abrir "Buscar leads" (sem o @)</label>
+        <input type="text" id="cfg-default-target" placeholder="ex: kiwify">
+        <div class="hint">Preenche automaticamente o campo ao abrir o modal de busca.</div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🤖 Inteligência Artificial</div>
+      <div class="settings-field">
+        <label>Contexto do seu negócio (para IA gerar mensagens melhores)</label>
+        <textarea id="cfg-business-context" placeholder="Ex: Ofereço soluções de pagamento e ecommerce para pequenos empreendedores. Meu diferencial é a facilidade de uso e suporte em português."></textarea>
+        <div class="hint">A IA usa esse texto para criar mensagens de prospecção personalizadas.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+      <button class="btn" onclick="closeSettings()">Cancelar</button>
+      <button class="btn btn-pink" onclick="saveSettings()">Salvar configurações</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://imrsllqxvwizrukyymfd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_p0bKFOsPrA0v266Nqb6Ipg_K5rrAeAR';
@@ -198,6 +267,58 @@ const bioCache = {};
 let currentLead = null;
 let allLeads = [];
 window.ANTHROPIC_KEY = '';
+
+// ========== SETTINGS ==========
+function loadSettings() {
+  return {
+    igUsername: localStorage.getItem('cfg_ig_username') || '',
+    defaultTarget: localStorage.getItem('cfg_default_target') || '',
+    businessContext: localStorage.getItem('cfg_business_context') || 'Ofereço soluções de pagamento e ecommerce para pequenos empreendedores.'
+  };
+}
+
+function openSettings() {
+  const cfg = loadSettings();
+  document.getElementById('cfg-ig-username').value = cfg.igUsername;
+  document.getElementById('cfg-default-target').value = cfg.defaultTarget;
+  document.getElementById('cfg-business-context').value = cfg.businessContext;
+  document.getElementById('settings-saved-msg').classList.add('hidden');
+  updateAccountPreview();
+  document.getElementById('settings-modal').classList.remove('hidden');
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').classList.add('hidden');
+}
+
+function updateAccountPreview() {
+  const val = document.getElementById('cfg-ig-username').value.trim().replace('@','');
+  const preview = document.getElementById('account-preview');
+  if (val) {
+    preview.classList.remove('hidden');
+    document.getElementById('account-preview-text').textContent = '@' + val + ' — conta conectada';
+    document.getElementById('account-dot').classList.add('connected');
+  } else {
+    preview.classList.add('hidden');
+  }
+}
+
+function saveSettings() {
+  const username = document.getElementById('cfg-ig-username').value.trim().replace('@','');
+  const target = document.getElementById('cfg-default-target').value.trim().replace('@','');
+  const context = document.getElementById('cfg-business-context').value.trim();
+
+  localStorage.setItem('cfg_ig_username', username);
+  localStorage.setItem('cfg_default_target', target);
+  localStorage.setItem('cfg_business_context', context);
+
+  document.getElementById('settings-saved-msg').classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById('settings-saved-msg').classList.add('hidden');
+    closeSettings();
+  }, 1500);
+}
+// ========== /SETTINGS ==========
 
 async function loadLeads() {
   const {data} = await sb.from('leads').select('*').order('score', {ascending:false});
@@ -313,6 +434,11 @@ async function waitForRun(runId) {
 }
 
 function openApify() {
+  // Preenche automaticamente com o alvo padrão das configurações
+  const cfg = loadSettings();
+  if (cfg.defaultTarget) {
+    document.getElementById('apify-username').value = cfg.defaultTarget;
+  }
   document.getElementById('apify-status').textContent = '';
   document.getElementById('apify-modal').classList.remove('hidden');
 }
@@ -325,63 +451,46 @@ async function runApify() {
   const username = document.getElementById('apify-username').value.trim().replace('@','');
   const limit = parseInt(document.getElementById('apify-limit').value) || 100;
   if (!username) { alert('Digite um username!'); return; }
-
   document.getElementById('apify-status').textContent = 'Passo 1/3: Buscando seguidores...';
-
   try {
-    // ACTOR 1: Pega lista de seguidores
     const run1Data = await callApify('startRun', {
       actorId: 'scraping_solutions~instagram-scraper-followers-following-no-cookies',
       input: {Account: [username], resultsLimit: limit}
     });
-
     const runId1 = run1Data.data && run1Data.data.id;
     if (!runId1) {
       document.getElementById('apify-status').textContent = 'Erro no Actor 1: ' + JSON.stringify(run1Data);
       return;
     }
-
     document.getElementById('apify-status').textContent = 'Passo 1/3: Aguardando seguidores... (1-2 min)';
     await waitForRun(runId1);
-
     const followers = await callApify('getResults', {runId: runId1});
     if (!followers.length) {
       document.getElementById('apify-status').textContent = 'Nenhum seguidor encontrado.';
       return;
     }
-
-    // Filtra só os novos
     document.getElementById('apify-status').textContent = 'Passo 2/3: Verificando leads novos...';
     const usernames = followers.map(f => f.username || f.userName).filter(Boolean);
     const {data: existing} = await sb.from('leads').select('username').in('username', usernames);
     const existingSet = new Set((existing||[]).map(e => e.username));
     const newUsernames = usernames.filter(u => !existingSet.has(u));
-
     if (!newUsernames.length) {
       document.getElementById('apify-status').textContent = 'Todos os seguidores já estão no banco!';
       return;
     }
-
     document.getElementById('apify-status').textContent = 'Passo 2/3: ' + newUsernames.length + ' leads novos. Buscando bios...';
-
-    // ACTOR 2: Pega bio de cada username novo
     const run2Data = await callApify('startRun', {
       actorId: 'datadoping~instagram-profile-scraper',
       input: {usernames: newUsernames}
     });
-
     const runId2 = run2Data.data && run2Data.data.id;
     if (!runId2) {
       document.getElementById('apify-status').textContent = 'Erro no Actor 2: ' + JSON.stringify(run2Data);
       return;
     }
-
     document.getElementById('apify-status').textContent = 'Passo 3/3: Buscando bios...';
     await waitForRun(runId2);
-
     const profiles = await callApify('getResults', {runId: runId2});
-console.log('Profiles recebidos:', profiles.length, JSON.stringify(profiles[0]));
-
     let saved = 0;
     for (const item of profiles) {
       const lead = {
@@ -392,20 +501,18 @@ console.log('Profiles recebidos:', profiles.length, JSON.stringify(profiles[0]))
         following: item.followsCount || item.followingCount || item.following || 0,
         is_open: item.private === false,
         has_link: !!(item.externalUrl || item.url || item.website || item.externalUrls),
-link_url: item.externalUrl || item.url || item.website || (item.externalUrls && item.externalUrls[0]) || '',
+        link_url: item.externalUrl || item.url || item.website || (item.externalUrls && item.externalUrls[0]) || '',
         is_business: item.isBusinessAccount || false,
         fonte: username,
         score: 0
       };
       if (!lead.username) continue;
       const {error} = await sb.from('leads').upsert(lead, {onConflict: 'username'});
-if (error) { document.getElementById('apify-status').textContent = 'Erro: ' + error.message; return; }
+      if (error) { document.getElementById('apify-status').textContent = 'Erro: ' + error.message; return; }
       saved++;
     }
-
     document.getElementById('apify-status').textContent = '✓ ' + saved + ' leads novos! (' + existingSet.size + ' já existiam)';
     setTimeout(() => { closeApify(); loadLeads(); }, 2000);
-
   } catch(e) {
     document.getElementById('apify-status').textContent = 'Erro: ' + e.message;
   }
@@ -413,6 +520,7 @@ if (error) { document.getElementById('apify-status').textContent = 'Erro: ' + er
 
 async function fetchBio(lead) {
   if (bioCache[lead.id]) return bioCache[lead.id];
+  const cfg = loadSettings();
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
@@ -491,13 +599,15 @@ function closeModal() {
 
 async function generateMsg() {
   if (!currentLead) return;
+  const cfg = loadSettings();
+  const context = cfg.businessContext || 'Ofereço soluções de pagamento e ecommerce.';
   document.getElementById('modal-status').textContent = 'Gerando mensagem...';
   document.getElementById('msg-text').value = '';
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
-      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:'Crie uma mensagem curta de prospecção para Instagram Direct (máximo 3 linhas, tom natural) para "'+( currentLead.full_name||currentLead.username)+'" (@'+currentLead.username+'). Bio: "'+( currentLead.bio||'sem bio')+'". Perfil '+(currentLead.is_open?'aberto':'fechado')+(currentLead.has_link?', tem link na bio':'')+'. Ofereço soluções de pagamento e ecommerce. Responda APENAS com o texto da mensagem.'}]})
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:'Crie uma mensagem curta de prospecção para Instagram Direct (máximo 3 linhas, tom natural e humano, sem parecer spam) para "'+( currentLead.full_name||currentLead.username)+'" (@'+currentLead.username+'). Bio: "'+( currentLead.bio||'sem bio')+'". Perfil '+(currentLead.is_open?'aberto':'fechado')+(currentLead.has_link?', tem link na bio':'')+'. Contexto do meu negócio: '+context+'. Responda APENAS com o texto da mensagem, sem aspas.'}]})
     });
     const data = await res.json();
     const txt = (data.content && data.content.find(c=>c.type==='text') && data.content.find(c=>c.type==='text').text) || 'Oi! Vi seu perfil e me interessei pelo que você faz. Tenho uma solução que pode ajudar muito suas vendas. Posso te contar mais?';
