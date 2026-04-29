@@ -400,12 +400,20 @@ function renderLeads() {
     const bioContent = l.bio_summary ? l.bio_summary : '<button class="btn-analyze" onclick="analyzeSingle(\''+l.id+'\',this.parentElement)">Analisar com IA</button>';
     const row = document.createElement('div');
     row.className = 'lead-row';
+    const linkBadge = l.has_link && l.link_url
+      ? `<a href="${l.link_url}" target="_blank" rel="noopener" class="badge b-link" style="text-decoration:none" title="${l.link_url}">🔗 Link</a>`
+      : `<span class="badge b-nolink">Sem link</span>`;
     row.innerHTML = `
       <div class="avatar" style="background:${l.color}22;color:${l.color}">${initials}</div>
-      <div><div class="lead-name">${l.full_name||l.username}</div><div class="lead-handle">@${l.username}</div></div>
+      <div>
+        <a href="https://instagram.com/${l.username}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
+          <div class="lead-name" style="cursor:pointer" title="Ver no Instagram">${l.full_name||l.username}</div>
+        </a>
+        <div class="lead-handle">@${l.username}</div>
+      </div>
       <div style="display:flex;gap:3px;flex-wrap:wrap">
         <span class="badge ${l.is_open?'b-open':'b-closed'}">${l.is_open?'Aberto':'Fechado'}</span>
-        <span class="badge ${l.has_link?'b-link':'b-nolink'}">${l.has_link?'Link':'Sem link'}</span>
+        ${linkBadge}
       </div>
       <div style="font-size:13px;color:#666">${(l.followers||0).toLocaleString('pt-BR')}</div>
       <div class="score-wrap"><div class="score-bar"><div class="score-fill" style="width:${l.score}%;background:${sc}"></div></div><span class="score-num" style="color:${sc}">${l.score}</span></div>
