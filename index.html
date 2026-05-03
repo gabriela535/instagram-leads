@@ -677,7 +677,9 @@ function openApify() {
 function closeApify() { document.getElementById('apify-modal').classList.add('hidden'); }
 
 async function runApify() {
-  if(!currentUser) return;
+  const {data:{user}} = await sb.auth.getUser();
+  if(!user) { alert('Você precisa estar logado!'); return; }
+  currentUser = user;
   const username = document.getElementById('apify-username').value.trim().replace('@','');
   const limit = parseInt(document.getElementById('apify-limit').value)||100;
   if(!username) { alert('Digite um username!'); return; }
