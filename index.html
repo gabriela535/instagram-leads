@@ -8,23 +8,48 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 body{background:#f5f5f5;color:#1a1a1a}
+.auth-screen{position:fixed;inset:0;background:#f5f5f5;display:flex;align-items:center;justify-content:center;z-index:999}
+.auth-box{background:#fff;border-radius:16px;padding:36px;width:380px;max-width:95vw;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.auth-logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;margin-bottom:28px;justify-content:center}
+.auth-logo-icon{width:36px;height:36px;background:#E1306C;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700}
+.auth-title{font-size:20px;font-weight:700;margin-bottom:6px;text-align:center}
+.auth-sub{font-size:13px;color:#888;margin-bottom:24px;text-align:center}
+.auth-field{margin-bottom:14px}
+.auth-field label{font-size:13px;font-weight:500;color:#444;display:block;margin-bottom:5px}
+.auth-field input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px}
+.auth-field input:focus{outline:none;border-color:#E1306C}
+.auth-btn{width:100%;padding:11px;background:#E1306C;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px}
+.auth-btn:hover{background:#c0235a}
+.auth-err{font-size:12px;color:#e24b4a;margin-top:8px;text-align:center;min-height:16px}
+.auth-switch{font-size:13px;color:#888;text-align:center;margin-top:16px}
+.auth-switch a{color:#E1306C;cursor:pointer;text-decoration:none;font-weight:500}
 .header{background:#fff;border-bottom:1px solid #e5e5e5;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
 .logo-icon{width:28px;height:28px;background:#E1306C;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
-.main{padding:24px;max-width:1200px;margin:0 auto}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.user-badge{font-size:12px;color:#666;background:#f5f5f5;padding:4px 10px;border-radius:20px}
+.tabs{display:flex;gap:0;border-bottom:2px solid #e5e5e5;margin-bottom:20px}
+.tab{font-size:13px;font-weight:600;padding:10px 20px;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab.active{color:#E1306C;border-bottom-color:#E1306C}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+.main{padding:24px;max-width:1300px;margin:0 auto}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
 .stat{background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #e5e5e5}
 .stat-label{font-size:12px;color:#888;margin-bottom:4px}
 .stat-val{font-size:22px;font-weight:600}
 .card{background:#fff;border-radius:10px;border:1px solid #e5e5e5;padding:16px;margin-bottom:16px}
 .card-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
-.score-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.score-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.score-rules-2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .rule{padding:10px 12px;border-radius:8px}
 .rule-green{background:#eaf3de}.rule-amber{background:#faeeda}.rule-red{background:#fcebeb}
+.rule-blue{background:#e6f1fb}.rule-purple{background:#f0ebfb}.rule-teal{background:#e6fbf6}
 .rule-title{font-size:11px;font-weight:600;margin-bottom:2px}
 .rule-green .rule-title{color:#3b6d11}.rule-amber .rule-title{color:#854f0b}.rule-red .rule-title{color:#a32d2d}
+.rule-blue .rule-title{color:#185fa5}.rule-purple .rule-title{color:#6b35c0}.rule-teal .rule-title{color:#0d6b55}
 .rule-pts{font-size:17px;font-weight:700}
 .rule-green .rule-pts{color:#3b6d11}.rule-amber .rule-pts{color:#ba7517}.rule-red .rule-pts{color:#e24b4a}
+.rule-blue .rule-pts{color:#185fa5}.rule-purple .rule-pts{color:#6b35c0}.rule-teal .rule-pts{color:#0d6b55}
 .kw-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .kw-badge{font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid transparent;cursor:pointer}
 .kw-hot{background:#D85A30;color:#fff}.kw-warm{background:#BA7517;color:#fff}
@@ -43,25 +68,30 @@ body{background:#f5f5f5;color:#1a1a1a}
 .btn-apify:hover{background:#e06d00}
 .btn-settings{background:#fff;border:1px solid #ddd;font-size:13px;padding:7px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;color:#555}
 .btn-settings:hover{background:#f5f5f5}
+.btn-logout{background:#fff;border:1px solid #ddd;font-size:12px;padding:5px 10px;border-radius:8px;cursor:pointer;color:#888}
+.btn-logout:hover{background:#fee;color:#e24b4a;border-color:#e24b4a}
 .table{background:#fff;border-radius:10px;border:1px solid #e5e5e5;overflow:hidden}
-.table-header{display:grid;grid-template-columns:36px 200px 100px 80px 110px 1fr 120px;gap:8px;padding:10px 16px;background:#f9f9f9;font-size:12px;font-weight:600;color:#888;border-bottom:1px solid #e5e5e5}
-.lead-row{display:grid;grid-template-columns:36px 200px 100px 80px 110px 1fr 120px;gap:8px;padding:10px 16px;align-items:center;border-bottom:1px solid #f0f0f0}
+.table-header{display:grid;grid-template-columns:36px 175px 90px 70px 120px 90px 140px 120px;gap:8px;padding:10px 16px;background:#f9f9f9;font-size:11px;font-weight:600;color:#888;border-bottom:1px solid #e5e5e5}
+.lead-row{display:grid;grid-template-columns:36px 175px 90px 70px 120px 90px 140px 120px;gap:8px;padding:10px 16px;align-items:center;border-bottom:1px solid #f0f0f0}
 .lead-row:last-child{border-bottom:none}
 .lead-row:hover{background:#fafafa}
 .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
 .lead-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lead-handle{font-size:11px;color:#888}
-.badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;white-space:nowrap}
+.badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;white-space:nowrap;display:inline-block}
 .b-open{background:#eaf3de;color:#3b6d11}.b-closed{background:#f0f0f0;color:#666}
 .b-link{background:#e6f1fb;color:#185fa5}.b-nolink{background:#f0f0f0;color:#888}
+.b-fonte{background:#f0ebfb;color:#6b35c0;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;display:inline-block}
 .score-wrap{display:flex;align-items:center;gap:6px}
-.score-bar{height:6px;border-radius:3px;flex:1;background:#f0f0f0;overflow:hidden}
+.score-bar{height:6px;border-radius:3px;flex:1;background:#f0f0f0;overflow:hidden;min-width:36px}
 .score-fill{height:100%;border-radius:3px}
 .score-num{font-size:13px;font-weight:700;min-width:26px;text-align:right}
-.bio-cell{font-size:12px;color:#666;line-height:1.4}
-.btn-analyze{font-size:11px;padding:3px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#666}
-.btn-direct{font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+.bio-cell{font-size:11px;color:#555;line-height:1.4}
+.btn-analyze{font-size:10px;padding:3px 7px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#666;white-space:nowrap}
+.btn-direct{font-size:11px;padding:4px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
 .btn-direct:hover{background:#E1306C;color:#fff;border-color:#E1306C}
+.btn-chat{font-size:11px;padding:4px 8px;border-radius:8px;border:1px solid #c8e0f7;background:#e6f1fb;cursor:pointer;color:#185fa5}
+.btn-chat:hover{background:#c8e0f7}
 .dots{display:inline-flex;gap:3px}
 .dots span{width:4px;height:4px;border-radius:50%;background:#999;animation:pulse 1.2s infinite}
 .dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
@@ -85,8 +115,6 @@ body{background:#f5f5f5;color:#1a1a1a}
 .apify-box label{font-size:13px;color:#666;display:block;margin-bottom:4px}
 .progress{height:4px;background:#f0f0f0;border-radius:2px;overflow:hidden;margin-bottom:16px}
 .progress-fill{height:100%;background:#E1306C;border-radius:2px;transition:width .3s}
-
-/* Settings Modal */
 .settings-box{background:#fff;border-radius:12px;padding:24px;width:500px;max-width:95vw}
 .settings-box h2{font-size:16px;font-weight:600;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
 .settings-box p{font-size:13px;color:#888;margin-bottom:20px}
@@ -97,22 +125,85 @@ body{background:#f5f5f5;color:#1a1a1a}
 .settings-field input,.settings-field textarea{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit}
 .settings-field textarea{min-height:70px;resize:vertical}
 .settings-field .hint{font-size:11px;color:#aaa;margin-top:3px}
-.settings-field a{color:#185fa5;text-decoration:none;font-size:11px}
-.settings-field a:hover{text-decoration:underline}
 .settings-saved{font-size:12px;color:#3b6d11;background:#eaf3de;padding:8px 12px;border-radius:8px;margin-bottom:12px}
-.account-preview{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f5f5f5;border-radius:8px;margin-bottom:12px;font-size:13px}
-.account-dot{width:8px;height:8px;border-radius:50%;background:#ccc}
-.account-dot.connected{background:#3b6d11}
+.chat-box{background:#fff;border-radius:12px;width:540px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.chat-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.chat-history{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:220px;max-height:380px}
+.chat-msg{max-width:80%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5;word-break:break-word}
+.chat-msg.sent{background:#E1306C;color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+.chat-msg.received{background:#f0f0f0;color:#1a1a1a;align-self:flex-start;border-bottom-left-radius:3px}
+.chat-msg-meta{font-size:10px;opacity:.7;margin-top:3px}
+.chat-empty{text-align:center;color:#aaa;font-size:13px;padding:30px 0}
+.chat-input-area{padding:12px 16px;border-top:1px solid #f0f0f0;display:flex;gap:8px;align-items:center}
+.chat-input-area input{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:20px;font-size:13px}
+.chat-input-area select{font-size:12px;padding:6px 8px;border:1px solid #ddd;border-radius:8px;min-width:80px}
+.chat-send{padding:8px 16px;background:#E1306C;color:#fff;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap}
+.contacted-empty{text-align:center;color:#aaa;padding:60px 0;font-size:14px}
+
+/* ADMIN */
+.admin-screen{position:fixed;inset:0;background:#f5f5f5;z-index:90;overflow-y:auto;display:none}
+.admin-header{background:#1a1a2e;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.admin-logo{color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.admin-logo-icon{width:28px;height:28px;background:#E1306C;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.admin-main{padding:24px;max-width:1200px;margin:0 auto}
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.admin-stat{background:#fff;border-radius:10px;padding:16px;border:1px solid #e5e5e5}
+.admin-stat-label{font-size:12px;color:#888;margin-bottom:4px}
+.admin-stat-val{font-size:26px;font-weight:700}
+.admin-card{background:#fff;border-radius:10px;border:1px solid #e5e5e5;overflow:hidden;margin-bottom:20px}
+.admin-card-title{font-size:13px;font-weight:700;color:#444;padding:14px 18px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.client-row{display:grid;grid-template-columns:1fr 100px 100px 100px 120px 160px;gap:12px;padding:12px 18px;align-items:center;border-bottom:1px solid #f5f5f5;font-size:13px}
+.client-row:last-child{border-bottom:none}
+.client-row:hover{background:#fafafa}
+.client-header{display:grid;grid-template-columns:1fr 100px 100px 100px 120px 160px;gap:12px;padding:10px 18px;background:#f9f9f9;font-size:11px;font-weight:700;color:#888;border-bottom:1px solid #e5e5e5}
+.status-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;display:inline-block}
+.status-active{background:#eaf3de;color:#3b6d11}
+.status-blocked{background:#fcebeb;color:#a32d2d}
+.admin-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer}
+.admin-btn:hover{background:#f5f5f5}
+.admin-btn-danger{border-color:#e24b4a;color:#e24b4a}
+.admin-btn-danger:hover{background:#fee}
+.admin-btn-success{border-color:#3b6d11;color:#3b6d11}
+.admin-btn-success:hover{background:#eaf3de}
+.admin-btn-primary{border-color:#185fa5;color:#185fa5}
+.admin-btn-primary:hover{background:#e6f1fb}
+.limit-input{width:70px;padding:4px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;text-align:center}
+.progress-bar{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:3px;background:#E1306C}
+.client-leads-modal{background:#fff;border-radius:12px;width:900px;max-width:95vw;max-height:85vh;overflow:hidden;display:flex;flex-direction:column}
+.client-leads-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.client-leads-body{overflow-y:auto;flex:1}
+.mini-lead-row{display:grid;grid-template-columns:140px 80px 60px 80px 1fr;gap:8px;padding:8px 16px;border-bottom:1px solid #f5f5f5;font-size:12px;align-items:center}
+.mini-lead-row:hover{background:#fafafa}
 </style>
 </head>
 <body>
 
+<!-- AUTH -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo"><div class="auth-logo-icon">IG</div> Instagram Lead Qualifier</div>
+    <div class="auth-title" id="auth-title">Entrar</div>
+    <div class="auth-sub" id="auth-sub">Acesse sua conta para gerenciar seus leads</div>
+    <div class="auth-field"><label>Email</label><input type="email" id="auth-email" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')authSubmit()"></div>
+    <div class="auth-field"><label>Senha</label><input type="password" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')authSubmit()"></div>
+    <button class="auth-btn" onclick="authSubmit()" id="auth-btn">Entrar</button>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-switch"><span id="auth-switch-text">Não tem conta?</span> <a onclick="toggleAuthMode()"><span id="auth-switch-link">Criar conta</span></a></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
 <div class="header">
   <div class="logo"><div class="logo-icon">IG</div> Instagram Lead Qualifier</div>
   <div style="display:flex;gap:8px;align-items:center">
+    <span class="user-badge" id="user-email-badge">👤</span>
+    <button class="btn" id="btn-admin" onclick="goToAdmin()" style="display:none;background:#1a1a2e;color:#fff;border-color:#1a1a2e">🛡️ Admin</button>
     <button class="btn-settings" onclick="openSettings()">⚙️ Configurações</button>
     <button class="btn-apify" onclick="openApify()">Buscar leads no Instagram</button>
     <button class="btn" onclick="requalify()">Re-qualificar</button>
+    <button class="btn-logout" onclick="logout()">Sair</button>
   </div>
 </div>
 
@@ -122,6 +213,7 @@ body{background:#f5f5f5;color:#1a1a1a}
     <div class="stat"><div class="stat-label">Score alto (+70)</div><div class="stat-val" id="s-high" style="color:#D85A30">0</div></div>
     <div class="stat"><div class="stat-label">Aberto + link</div><div class="stat-val" id="s-linkopen" style="color:#3b6d11">0</div></div>
     <div class="stat"><div class="stat-label">Qualificados (+40)</div><div class="stat-val" id="s-qual" style="color:#185fa5">0</div></div>
+    <div class="stat"><div class="stat-label">Contactados</div><div class="stat-val" id="s-contacted" style="color:#6b35c0">0</div></div>
   </div>
 
   <div class="card">
@@ -130,6 +222,11 @@ body{background:#f5f5f5;color:#1a1a1a}
       <div class="rule rule-green"><div class="rule-title">Aberto + link na bio</div><div class="rule-pts">+40 pts</div></div>
       <div class="rule rule-amber"><div class="rule-title">Aberto sem link</div><div class="rule-pts">+15 pts</div></div>
       <div class="rule rule-red"><div class="rule-title">Perfil fechado</div><div class="rule-pts">+5 pts</div></div>
+    </div>
+    <div class="score-rules-2">
+      <div class="rule rule-blue"><div class="rule-title">🛒 Link Ecommerce / Landing Page</div><div class="rule-pts">+25 pts</div></div>
+      <div class="rule rule-teal"><div class="rule-title">💬 Link WhatsApp direto</div><div class="rule-pts">+20 pts</div></div>
+      <div class="rule rule-purple"><div class="rule-title">🔗 Link Linktree / Bio link</div><div class="rule-pts">+22 pts</div></div>
     </div>
     <div style="font-size:11px;font-weight:600;color:#888;letter-spacing:.05em;margin-bottom:6px">HOT +25pts</div>
     <div class="kw-row" id="kw-hot"></div>
@@ -142,16 +239,13 @@ body{background:#f5f5f5;color:#1a1a1a}
       <input type="number" id="score-min" value="25" min="0" max="100" style="width:65px" oninput="renderLeads()">
       <label>Perfil</label>
       <select id="filter-type" onchange="renderLeads()">
-        <option value="all">Todos</option>
-        <option value="open">Aberto</option>
-        <option value="link">Aberto + link</option>
-        <option value="closed">Fechado</option>
+        <option value="all">Todos</option><option value="open">Aberto</option><option value="link">Aberto + link</option><option value="closed">Fechado</option>
       </select>
+      <label>Fonte</label>
+      <select id="filter-fonte" onchange="renderLeads()"><option value="all">Todas</option></select>
       <label>Ordenar</label>
       <select id="sort-by" onchange="renderLeads()">
-        <option value="score">Score</option>
-        <option value="name">Nome</option>
-        <option value="followers">Seguidores</option>
+        <option value="score">Score</option><option value="name">Nome</option><option value="followers">Seguidores</option>
       </select>
     </div>
   </div>
@@ -162,11 +256,74 @@ body{background:#f5f5f5;color:#1a1a1a}
     <button class="btn" id="btn-all" onclick="analyzeAll()">Analisar todos com IA</button>
   </div>
 
-  <div class="table">
-    <div class="table-header">
-      <div></div><div>Perfil</div><div>Status</div><div>Seguidores</div><div>Score</div><div>Análise IA</div><div>Ação</div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('leads')" id="tab-leads">📋 Leads novos</div>
+    <div class="tab" onclick="switchTab('contacted')" id="tab-contacted">✉️ Contactados</div>
+  </div>
+
+  <div id="pane-leads" class="tab-pane active">
+    <div class="table">
+      <div class="table-header"><div></div><div>Perfil</div><div>Status</div><div>Seguidores</div><div>Score</div><div>Fonte</div><div>Resumo IA</div><div>Ação</div></div>
+      <div id="leads-body"></div>
     </div>
-    <div id="leads-body"></div>
+  </div>
+
+  <div id="pane-contacted" class="tab-pane">
+    <div class="table">
+      <div class="table-header"><div></div><div>Perfil</div><div>Status</div><div>Seguidores</div><div>Score</div><div>Fonte</div><div>Resumo IA</div><div>Ação</div></div>
+      <div id="contacted-body"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div id="admin-screen" class="admin-screen">
+  <div class="admin-header">
+    <div class="admin-logo"><div class="admin-logo-icon">IG</div> Painel Admin — Instagram Lead Qualifier</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="color:#aaa;font-size:12px" id="admin-user-badge">👤</span>
+      <button class="admin-btn" onclick="goToApp()" style="background:#fff">← Voltar ao app</button>
+      <button class="admin-btn admin-btn-danger" onclick="logout()">Sair</button>
+    </div>
+  </div>
+  <div class="admin-main">
+    <div class="admin-stats">
+      <div class="admin-stat"><div class="admin-stat-label">Total de clientes</div><div class="admin-stat-val" id="adm-total-clients">0</div></div>
+      <div class="admin-stat"><div class="admin-stat-label">Clientes ativos</div><div class="admin-stat-val" id="adm-active-clients" style="color:#3b6d11">0</div></div>
+      <div class="admin-stat"><div class="admin-stat-label">Total de leads</div><div class="admin-stat-val" id="adm-total-leads" style="color:#E1306C">0</div></div>
+      <div class="admin-stat"><div class="admin-stat-label">Total contactados</div><div class="admin-stat-val" id="adm-total-contacted" style="color:#6b35c0">0</div></div>
+    </div>
+
+    <div class="admin-card">
+      <div class="admin-card-title">
+        <span>👥 Clientes</span>
+        <input type="text" id="admin-search" placeholder="Buscar por email..." style="font-size:12px;padding:5px 10px;border:1px solid #ddd;border-radius:8px;width:220px" oninput="renderAdminClients()">
+      </div>
+      <div class="client-header">
+        <div>Cliente</div><div>Status</div><div>Leads</div><div>Contactados</div><div>Limite</div><div>Ações</div>
+      </div>
+      <div id="admin-clients-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal leads do cliente -->
+<div id="client-leads-modal" class="modal hidden">
+  <div class="client-leads-modal">
+    <div class="client-leads-header">
+      <div>
+        <div style="font-size:15px;font-weight:700" id="client-leads-title">Leads</div>
+        <div style="font-size:12px;color:#888" id="client-leads-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeClientLeads()">×</button>
+    </div>
+    <div class="client-leads-body">
+      <div style="display:grid;grid-template-columns:140px 80px 60px 80px 1fr;gap:8px;padding:8px 16px;background:#f9f9f9;font-size:11px;font-weight:700;color:#888;border-bottom:1px solid #e5e5e5">
+        <div>Perfil</div><div>Status</div><div>Score</div><div>Fonte</div><div>Bio</div>
+      </div>
+      <div id="client-leads-list"></div>
+    </div>
   </div>
 </div>
 
@@ -178,13 +335,32 @@ body{background:#f5f5f5;color:#1a1a1a}
     <div class="modal-breakdown" id="modal-breakdown"></div>
     <div class="modal-status" id="modal-status"></div>
     <textarea class="modal-textarea" id="msg-text" placeholder="Escreva ou gere com IA..."></textarea>
-    <div id="sent-ok" class="success hidden">Mensagem copiada! Abrindo Instagram...</div>
+    <div id="sent-ok" class="success hidden">✓ Copiado! Abrindo Instagram... Lead movido para Contactados.</div>
     <div class="modal-footer">
       <button class="btn" onclick="generateMsg()">Gerar com IA</button>
       <div style="display:flex;gap:8px">
         <button class="btn" onclick="closeModal()">Cancelar</button>
         <button class="btn btn-pink" onclick="sendDirect()">Copiar e abrir IG</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Chat -->
+<div id="chat-modal" class="modal hidden">
+  <div class="chat-box">
+    <div class="chat-header">
+      <div>
+        <div style="font-size:15px;font-weight:600" id="chat-title">Chat</div>
+        <div style="font-size:12px;color:#888" id="chat-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeChat()">×</button>
+    </div>
+    <div class="chat-history" id="chat-history"></div>
+    <div class="chat-input-area">
+      <select id="chat-msg-type"><option value="sent">📤 Enviado</option><option value="received">📥 Recebido</option></select>
+      <input id="chat-input" placeholder="Escreva a mensagem..." onkeydown="if(event.key==='Enter')addChatMsg()">
+      <button class="chat-send" onclick="addChatMsg()">Salvar</button>
     </div>
   </div>
 </div>
@@ -209,27 +385,9 @@ body{background:#f5f5f5;color:#1a1a1a}
 <!-- Modal Configurações -->
 <div id="settings-modal" class="modal hidden">
   <div class="settings-box">
-    <h2>
-      ⚙️ Configurações
-      <button class="modal-close" onclick="closeSettings()">×</button>
-    </h2>
-    <p>Personalize sua conta e preferências. Salvo localmente no navegador.</p>
-
+    <h2>⚙️ Configurações <button class="modal-close" onclick="closeSettings()">×</button></h2>
+    <p>Preferências salvas localmente no navegador.</p>
     <div id="settings-saved-msg" class="settings-saved hidden">✓ Configurações salvas!</div>
-
-    <div class="settings-section">
-      <div class="settings-section-title">📱 Sua conta do Instagram</div>
-      <div class="settings-field">
-        <label>Seu @ do Instagram (conta que vai prospectar)</label>
-        <input type="text" id="cfg-ig-username" placeholder="ex: meuig" oninput="updateAccountPreview()">
-        <div class="hint">Usado para personalizar a mensagem do Direct e abrir a conversa certa.</div>
-      </div>
-      <div id="account-preview" class="account-preview hidden">
-        <div class="account-dot connected" id="account-dot"></div>
-        <span id="account-preview-text">@</span>
-      </div>
-    </div>
-
     <div class="settings-section">
       <div class="settings-section-title">🎯 Conta padrão para buscar seguidores</div>
       <div class="settings-field">
@@ -238,19 +396,17 @@ body{background:#f5f5f5;color:#1a1a1a}
         <div class="hint">Preenche automaticamente o campo ao abrir o modal de busca.</div>
       </div>
     </div>
-
     <div class="settings-section">
       <div class="settings-section-title">🤖 Inteligência Artificial</div>
       <div class="settings-field">
-        <label>Contexto do seu negócio (para IA gerar mensagens melhores)</label>
-        <textarea id="cfg-business-context" placeholder="Ex: Ofereço soluções de pagamento e ecommerce para pequenos empreendedores. Meu diferencial é a facilidade de uso e suporte em português."></textarea>
+        <label>Contexto do seu negócio</label>
+        <textarea id="cfg-business-context" placeholder="Ex: Ofereço soluções de pagamento e ecommerce para pequenos empreendedores..."></textarea>
         <div class="hint">A IA usa esse texto para criar mensagens de prospecção personalizadas.</div>
       </div>
     </div>
-
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
       <button class="btn" onclick="closeSettings()">Cancelar</button>
-      <button class="btn btn-pink" onclick="saveSettings()">Salvar configurações</button>
+      <button class="btn btn-pink" onclick="saveSettings()">Salvar</button>
     </div>
   </div>
 </div>
@@ -264,66 +420,93 @@ let hotKws = ['gateway','checkout','ecommerce','payment','loja virtual','vendas 
 let warmKws = ['negócios','mei','cnpj','empresa','empresário','microempreendedor'];
 const COLORS = ['#E1306C','#405DE6','#833AB4','#FCAF45','#F77737','#5851DB'];
 const bioCache = {};
-let currentLead = null;
-let allLeads = [];
+let currentLead = null, chatLead = null, allLeads = [], currentUser = null;
+let authMode = 'login';
 window.ANTHROPIC_KEY = '';
 
-// ========== SETTINGS ==========
+// AUTH
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  const isLogin = authMode === 'login';
+  document.getElementById('auth-title').textContent = isLogin ? 'Entrar' : 'Criar conta';
+  document.getElementById('auth-sub').textContent = isLogin ? 'Acesse sua conta para gerenciar seus leads' : 'Crie sua conta gratuita';
+  document.getElementById('auth-btn').textContent = isLogin ? 'Entrar' : 'Criar conta';
+  document.getElementById('auth-switch-text').textContent = isLogin ? 'Não tem conta?' : 'Já tem conta?';
+  document.getElementById('auth-switch-link').textContent = isLogin ? 'Criar conta' : 'Entrar';
+  document.getElementById('auth-err').textContent = '';
+}
+
+async function authSubmit() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const err = document.getElementById('auth-err');
+  err.textContent = ''; err.style.color = '#e24b4a';
+  if (!email || !password) { err.textContent = 'Preencha email e senha.'; return; }
+  document.getElementById('auth-btn').textContent = 'Aguarde...';
+  try {
+    let result;
+    if (authMode === 'login') {
+      result = await sb.auth.signInWithPassword({email, password});
+    } else {
+      result = await sb.auth.signUp({email, password});
+    }
+    if (result.error) {
+      err.textContent = result.error.message === 'Invalid login credentials' ? 'Email ou senha incorretos.' : result.error.message;
+    } else if (authMode === 'signup' && !result.data.session) {
+      err.style.color = '#3b6d11';
+      err.textContent = 'Conta criada! Verifique seu email para confirmar.';
+    }
+  } catch(e) { err.textContent = 'Erro ao conectar. Tente novamente.'; }
+  document.getElementById('auth-btn').textContent = authMode === 'login' ? 'Entrar' : 'Criar conta';
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
+  allLeads = [];
+}
+
+// SETTINGS
 function loadSettings() {
   return {
-    igUsername: localStorage.getItem('cfg_ig_username') || '',
     defaultTarget: localStorage.getItem('cfg_default_target') || '',
     businessContext: localStorage.getItem('cfg_business_context') || 'Ofereço soluções de pagamento e ecommerce para pequenos empreendedores.'
   };
 }
-
 function openSettings() {
   const cfg = loadSettings();
-  document.getElementById('cfg-ig-username').value = cfg.igUsername;
   document.getElementById('cfg-default-target').value = cfg.defaultTarget;
   document.getElementById('cfg-business-context').value = cfg.businessContext;
   document.getElementById('settings-saved-msg').classList.add('hidden');
-  updateAccountPreview();
   document.getElementById('settings-modal').classList.remove('hidden');
 }
-
-function closeSettings() {
-  document.getElementById('settings-modal').classList.add('hidden');
-}
-
-function updateAccountPreview() {
-  const val = document.getElementById('cfg-ig-username').value.trim().replace('@','');
-  const preview = document.getElementById('account-preview');
-  if (val) {
-    preview.classList.remove('hidden');
-    document.getElementById('account-preview-text').textContent = '@' + val + ' — conta conectada';
-    document.getElementById('account-dot').classList.add('connected');
-  } else {
-    preview.classList.add('hidden');
-  }
-}
-
+function closeSettings() { document.getElementById('settings-modal').classList.add('hidden'); }
 function saveSettings() {
-  const username = document.getElementById('cfg-ig-username').value.trim().replace('@','');
-  const target = document.getElementById('cfg-default-target').value.trim().replace('@','');
-  const context = document.getElementById('cfg-business-context').value.trim();
-
-  localStorage.setItem('cfg_ig_username', username);
-  localStorage.setItem('cfg_default_target', target);
-  localStorage.setItem('cfg_business_context', context);
-
+  localStorage.setItem('cfg_default_target', document.getElementById('cfg-default-target').value.trim().replace('@',''));
+  localStorage.setItem('cfg_business_context', document.getElementById('cfg-business-context').value.trim());
   document.getElementById('settings-saved-msg').classList.remove('hidden');
-  setTimeout(() => {
-    document.getElementById('settings-saved-msg').classList.add('hidden');
-    closeSettings();
-  }, 1500);
+  setTimeout(() => { document.getElementById('settings-saved-msg').classList.add('hidden'); closeSettings(); }, 1500);
 }
-// ========== /SETTINGS ==========
 
-async function loadLeads() {
-  const {data} = await sb.from('leads').select('*').order('score', {ascending:false});
-  allLeads = data || [];
-  renderLeads();
+// TABS
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('pane-'+tab).classList.add('active');
+}
+
+// SCORE
+function detectLinkType(url) {
+  if (!url) return null;
+  const u = url.toLowerCase();
+  if (u.includes('wa.me') || u.includes('whatsapp.com') || u.includes('api.whatsapp')) return 'whatsapp';
+  if (u.includes('linktree') || u.includes('linktr.ee') || u.includes('link.bio') || u.includes('beacons.ai') || u.includes('bio.link') || u.includes('linklist') || u.includes('allmylinks')) return 'linktree';
+  if (u.includes('shopify') || u.includes('nuvemshop') || u.includes('woocommerce') || u.includes('hotmart') || u.includes('kiwify') || u.includes('eduzz') || u.includes('monetizze') || u.includes('checkout') || u.includes('loja') || u.includes('shop') || u.includes('produto') || u.includes('comprar') || u.includes('pay') || u.includes('.com') || u.includes('.com.br') || u.includes('.io')) return 'ecommerce';
+  return null;
 }
 
 function calcScore(lead) {
@@ -331,319 +514,532 @@ function calcScore(lead) {
   if (lead.is_open && lead.has_link) { score += 40; breakdown.push({pts:'+40',desc:'Aberto + link'}); }
   else if (lead.is_open) { score += 15; breakdown.push({pts:'+15',desc:'Aberto sem link'}); }
   else { score += 5; breakdown.push({pts:'+5',desc:'Perfil fechado'}); }
-  const bio = (lead.bio || '').toLowerCase();
+  const linkType = lead.link_type || detectLinkType(lead.link_url);
+  if (linkType==='ecommerce') { score += 25; breakdown.push({pts:'+25',desc:'🛒 Ecommerce'}); }
+  else if (linkType==='whatsapp') { score += 20; breakdown.push({pts:'+20',desc:'💬 WhatsApp'}); }
+  else if (linkType==='linktree') { score += 22; breakdown.push({pts:'+22',desc:'🔗 Linktree'}); }
+  const bio = (lead.bio||'').toLowerCase();
   hotKws.forEach(k => { if (bio.includes(k)) { score += 25; breakdown.push({pts:'+25',desc:'HOT: '+k}); }});
   warmKws.forEach(k => { if (bio.includes(k)) { score += 10; breakdown.push({pts:'+10',desc:'WARM: '+k}); }});
-  return {score: Math.max(0, Math.min(100, score)), breakdown};
+  return {score: Math.min(100, Math.max(0, score)), breakdown};
 }
-
 function scoreColor(s) { return s>=70?'#D85A30':s>=40?'#BA7517':'#999'; }
 
+// KEYWORDS
 function renderKw() {
   ['hot','warm'].forEach(type => {
-    const list = type==='hot' ? hotKws : warmKws;
+    const list = type==='hot'?hotKws:warmKws;
     const el = document.getElementById('kw-'+type);
     el.innerHTML = '';
     list.forEach((k,i) => {
       const b = document.createElement('span');
       b.className = 'kw-badge kw-'+type;
-      b.innerHTML = k + ' <span style="opacity:.7;cursor:pointer" onclick="removeKw(\''+type+'\','+i+',event)">×</span>';
+      b.innerHTML = k+' <span style="opacity:.7;cursor:pointer" onclick="removeKw(\''+type+'\','+i+',event)">×</span>';
       el.appendChild(b);
     });
   });
 }
-
 function addKw(type) {
   const inp = document.getElementById('new-'+type);
   const val = inp.value.trim().toLowerCase();
   if (!val) return;
-  if (type==='hot' && !hotKws.includes(val)) hotKws.push(val);
-  if (type==='warm' && !warmKws.includes(val)) warmKws.push(val);
-  inp.value = '';
-  renderKw();
-  renderLeads();
+  if (type==='hot'&&!hotKws.includes(val)) hotKws.push(val);
+  if (type==='warm'&&!warmKws.includes(val)) warmKws.push(val);
+  inp.value=''; renderKw(); renderLeads();
+}
+function removeKw(type,i,e) {
+  e.stopPropagation();
+  if(type==='hot') hotKws.splice(i,1); else warmKws.splice(i,1);
+  renderKw(); renderLeads();
 }
 
-function removeKw(type, i, e) {
-  e.stopPropagation();
-  if (type==='hot') hotKws.splice(i,1);
-  else warmKws.splice(i,1);
-  renderKw();
+// LEADS
+async function loadLeads() {
+  if (!currentUser) return;
+  const {data} = await sb.from('leads').select('*').eq('user_id', currentUser.id).order('score',{ascending:false});
+  allLeads = data||[];
+  updateFonteFilter();
   renderLeads();
+  renderContacted();
+}
+
+function updateFonteFilter() {
+  const sel = document.getElementById('filter-fonte');
+  const fontes = [...new Set(allLeads.map(l=>l.fonte).filter(Boolean))];
+  const cur = sel.value;
+  sel.innerHTML = '<option value="all">Todas</option>';
+  fontes.forEach(f => {
+    const o = document.createElement('option');
+    o.value=f; o.textContent='@'+f;
+    if(f===cur) o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+function buildRow(l, isContacted) {
+  const {score} = calcScore(l);
+  l.score = score;
+  const sc = scoreColor(score);
+  const color = COLORS[allLeads.findIndex(x=>x.id===l.id)%COLORS.length]||COLORS[0];
+  const initials = (l.full_name||l.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const linkBadge = l.has_link && l.link_url
+    ? `<a href="${l.link_url}" target="_blank" rel="noopener" class="badge b-link" style="text-decoration:none" title="${l.link_url}">🔗 Link</a>`
+    : `<span class="badge b-nolink">Sem link</span>`;
+  const fonteBadge = l.fonte ? `<span class="b-fonte">@${l.fonte}</span>` : '<span style="color:#ccc;font-size:11px">—</span>';
+  const bioContent = l.bio_summary
+    ? `<span>${l.bio_summary}</span>`
+    : `<button class="btn-analyze" onclick="analyzeSingle('${l.id}',this.parentElement)">Analisar com IA</button>`;
+  const actionBtns = isContacted
+    ? `<button class="btn-chat" onclick="openChat('${l.id}')">💬 Histórico</button>`
+    : `<button class="btn-direct" onclick="openDirect('${l.id}')">Direct</button>`;
+
+  const row = document.createElement('div');
+  row.className = 'lead-row';
+  row.innerHTML = `
+    <div class="avatar" style="background:${color}22;color:${color}">${initials}</div>
+    <div>
+      <a href="https://instagram.com/${l.username}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
+        <div class="lead-name" title="Ver no Instagram">${l.full_name||l.username}</div>
+      </a>
+      <div class="lead-handle">@${l.username}</div>
+    </div>
+    <div style="display:flex;gap:3px;flex-wrap:wrap">
+      <span class="badge ${l.is_open?'b-open':'b-closed'}">${l.is_open?'Aberto':'Fechado'}</span>
+      ${linkBadge}
+    </div>
+    <div style="font-size:13px;color:#666">${(l.followers||0).toLocaleString('pt-BR')}</div>
+    <div class="score-wrap"><div class="score-bar"><div class="score-fill" style="width:${score}%;background:${sc}"></div></div><span class="score-num" style="color:${sc}">${score}</span></div>
+    <div>${fonteBadge}</div>
+    <div class="bio-cell" id="bio-${l.id}">${bioContent}</div>
+    <div>${actionBtns}</div>`;
+  return row;
 }
 
 function renderLeads() {
-  const minScore = parseInt(document.getElementById('score-min').value) || 0;
+  const minScore = parseInt(document.getElementById('score-min').value)||0;
   const filterType = document.getElementById('filter-type').value;
+  const filterFonte = document.getElementById('filter-fonte').value;
   const sortBy = document.getElementById('sort-by').value;
-  let leads = allLeads.map((l,i) => ({...l, color:COLORS[i%COLORS.length], ...calcScore(l)}));
-  leads = leads.filter(l => l.score >= minScore);
-  if (filterType==='open') leads = leads.filter(l => l.is_open);
-  if (filterType==='link') leads = leads.filter(l => l.is_open && l.has_link);
-  if (filterType==='closed') leads = leads.filter(l => !l.is_open);
-  if (sortBy==='score') leads.sort((a,b) => b.score-a.score);
-  if (sortBy==='name') leads.sort((a,b) => (a.full_name||'').localeCompare(b.full_name||''));
-  if (sortBy==='followers') leads.sort((a,b) => (b.followers||0)-(a.followers||0));
-  document.getElementById('s-total').textContent = leads.length;
+
+  let leads = allLeads.filter(l=>!l.contacted).map(l=>({...l,...calcScore(l)}));
+  leads = leads.filter(l=>l.score>=minScore);
+  if(filterType==='open') leads=leads.filter(l=>l.is_open);
+  if(filterType==='link') leads=leads.filter(l=>l.is_open&&l.has_link);
+  if(filterType==='closed') leads=leads.filter(l=>!l.is_open);
+  if(filterFonte!=='all') leads=leads.filter(l=>l.fonte===filterFonte);
+  if(sortBy==='score') leads.sort((a,b)=>b.score-a.score);
+  if(sortBy==='name') leads.sort((a,b)=>(a.full_name||'').localeCompare(b.full_name||''));
+  if(sortBy==='followers') leads.sort((a,b)=>(b.followers||0)-(a.followers||0));
+
+  const contacted = allLeads.filter(l=>l.contacted);
+  document.getElementById('s-total').textContent = allLeads.filter(l=>!l.contacted).length;
   document.getElementById('s-high').textContent = leads.filter(l=>l.score>=70).length;
   document.getElementById('s-linkopen').textContent = leads.filter(l=>l.is_open&&l.has_link).length;
   document.getElementById('s-qual').textContent = leads.filter(l=>l.score>=40).length;
+  document.getElementById('s-contacted').textContent = contacted.length;
+
   const body = document.getElementById('leads-body');
   body.innerHTML = '';
-  if (leads.length === 0) {
-    body.innerHTML = '<div style="padding:40px;text-align:center;color:#999">Nenhum lead. Clique em "Buscar leads no Instagram" para começar!</div>';
+  if(!leads.length) { body.innerHTML='<div style="padding:40px;text-align:center;color:#999">Nenhum lead encontrado.</div>'; return; }
+  leads.forEach(l=>body.appendChild(buildRow(l, false)));
+}
+
+function renderContacted() {
+  const contacted = allLeads.filter(l=>l.contacted).map(l=>({...l,...calcScore(l)}));
+  const body = document.getElementById('contacted-body');
+  body.innerHTML = '';
+  if(!contacted.length) {
+    body.innerHTML='<div class="contacted-empty">Nenhum lead contactado ainda.<br><span style="font-size:12px">Após enviar um Direct, o lead aparece aqui.</span></div>';
     return;
   }
-  leads.forEach(l => {
-    const sc = scoreColor(l.score);
-    const initials = (l.full_name||l.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-    const bioContent = l.bio_summary ? l.bio_summary : '<button class="btn-analyze" onclick="analyzeSingle(\''+l.id+'\',this.parentElement)">Analisar com IA</button>';
-    const row = document.createElement('div');
-    row.className = 'lead-row';
-    const linkBadge = l.has_link && l.link_url
-      ? `<a href="${l.link_url}" target="_blank" rel="noopener" class="badge b-link" style="text-decoration:none" title="${l.link_url}">🔗 Link</a>`
-      : `<span class="badge b-nolink">Sem link</span>`;
-    row.innerHTML = `
-      <div class="avatar" style="background:${l.color}22;color:${l.color}">${initials}</div>
-      <div>
-        <a href="https://instagram.com/${l.username}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
-          <div class="lead-name" style="cursor:pointer" title="Ver no Instagram">${l.full_name||l.username}</div>
-        </a>
-        <div class="lead-handle">@${l.username}</div>
-      </div>
-      <div style="display:flex;gap:3px;flex-wrap:wrap">
-        <span class="badge ${l.is_open?'b-open':'b-closed'}">${l.is_open?'Aberto':'Fechado'}</span>
-        ${linkBadge}
-      </div>
-      <div style="font-size:13px;color:#666">${(l.followers||0).toLocaleString('pt-BR')}</div>
-      <div class="score-wrap"><div class="score-bar"><div class="score-fill" style="width:${l.score}%;background:${sc}"></div></div><span class="score-num" style="color:${sc}">${l.score}</span></div>
-      <div class="bio-cell" id="bio-${l.id}">${bioContent}</div>
-      <button class="btn-direct" onclick="openDirect('${l.id}')">Direct</button>`;
-    body.appendChild(row);
-  });
+  contacted.forEach(l=>body.appendChild(buildRow(l, true)));
 }
 
+// APIFY
 async function callApify(action, payload) {
-  const res = await fetch('/api/apify', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({action, payload})
-  });
+  const res = await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload})});
   return res.json();
 }
-
 async function waitForRun(runId) {
-  while (true) {
-    await new Promise(r => setTimeout(r, 5000));
-    const data = await callApify('getStatus', {runId});
-    const status = data.data && data.data.status;
-    if (status==='SUCCEEDED' || status==='FAILED' || status==='ABORTED') return status;
+  while(true) {
+    await new Promise(r=>setTimeout(r,5000));
+    const data = await callApify('getStatus',{runId});
+    const status = data.data&&data.data.status;
+    if(status==='SUCCEEDED'||status==='FAILED'||status==='ABORTED') return status;
   }
 }
-
 function openApify() {
-  // Preenche automaticamente com o alvo padrão das configurações
   const cfg = loadSettings();
-  if (cfg.defaultTarget) {
-    document.getElementById('apify-username').value = cfg.defaultTarget;
-  }
-  document.getElementById('apify-status').textContent = '';
+  if(cfg.defaultTarget) document.getElementById('apify-username').value=cfg.defaultTarget;
+  document.getElementById('apify-status').textContent='';
   document.getElementById('apify-modal').classList.remove('hidden');
 }
-
-function closeApify() {
-  document.getElementById('apify-modal').classList.add('hidden');
-}
+function closeApify() { document.getElementById('apify-modal').classList.add('hidden'); }
 
 async function runApify() {
+  if(!currentUser) return;
   const username = document.getElementById('apify-username').value.trim().replace('@','');
-  const limit = parseInt(document.getElementById('apify-limit').value) || 100;
-  if (!username) { alert('Digite um username!'); return; }
-  document.getElementById('apify-status').textContent = 'Passo 1/3: Buscando seguidores...';
+  const limit = parseInt(document.getElementById('apify-limit').value)||100;
+  if(!username) { alert('Digite um username!'); return; }
+  const setS = t => document.getElementById('apify-status').textContent = t;
+  setS('Passo 1/3: Buscando seguidores...');
   try {
-    const run1Data = await callApify('startRun', {
-      actorId: 'scraping_solutions~instagram-scraper-followers-following-no-cookies',
-      input: {Account: [username], resultsLimit: limit}
-    });
-    const runId1 = run1Data.data && run1Data.data.id;
-    if (!runId1) {
-      document.getElementById('apify-status').textContent = 'Erro no Actor 1: ' + JSON.stringify(run1Data);
-      return;
-    }
-    document.getElementById('apify-status').textContent = 'Passo 1/3: Aguardando seguidores... (1-2 min)';
+    const run1 = await callApify('startRun',{actorId:'scraping_solutions~instagram-scraper-followers-following-no-cookies',input:{Account:[username],resultsLimit:limit}});
+    const runId1 = run1.data&&run1.data.id;
+    if(!runId1) { setS('Erro Actor 1: '+JSON.stringify(run1)); return; }
+    setS('Passo 1/3: Aguardando seguidores... (1-2 min)');
     await waitForRun(runId1);
-    const followers = await callApify('getResults', {runId: runId1});
-    if (!followers.length) {
-      document.getElementById('apify-status').textContent = 'Nenhum seguidor encontrado.';
-      return;
-    }
-    document.getElementById('apify-status').textContent = 'Passo 2/3: Verificando leads novos...';
-    const usernames = followers.map(f => f.username || f.userName).filter(Boolean);
-    const {data: existing} = await sb.from('leads').select('username').in('username', usernames);
-    const existingSet = new Set((existing||[]).map(e => e.username));
-    const newUsernames = usernames.filter(u => !existingSet.has(u));
-    if (!newUsernames.length) {
-      document.getElementById('apify-status').textContent = 'Todos os seguidores já estão no banco!';
-      return;
-    }
-    document.getElementById('apify-status').textContent = 'Passo 2/3: ' + newUsernames.length + ' leads novos. Buscando bios...';
-    const run2Data = await callApify('startRun', {
-      actorId: 'datadoping~instagram-profile-scraper',
-      input: {usernames: newUsernames}
-    });
-    const runId2 = run2Data.data && run2Data.data.id;
-    if (!runId2) {
-      document.getElementById('apify-status').textContent = 'Erro no Actor 2: ' + JSON.stringify(run2Data);
-      return;
-    }
-    document.getElementById('apify-status').textContent = 'Passo 3/3: Buscando bios...';
+    const followers = await callApify('getResults',{runId:runId1});
+    if(!followers.length) { setS('Nenhum seguidor encontrado.'); return; }
+
+    setS('Passo 2/3: Verificando leads novos...');
+    const usernames = followers.map(f=>f.username||f.userName).filter(Boolean);
+    const {data:existing} = await sb.from('leads').select('username').eq('user_id',currentUser.id).in('username',usernames);
+    const existingSet = new Set((existing||[]).map(e=>e.username));
+    const newUsernames = usernames.filter(u=>!existingSet.has(u));
+    if(!newUsernames.length) { setS('Todos os seguidores já estão na sua base!'); return; }
+
+    setS('Passo 2/3: '+newUsernames.length+' leads novos. Buscando bios...');
+    const run2 = await callApify('startRun',{actorId:'datadoping~instagram-profile-scraper',input:{usernames:newUsernames}});
+    const runId2 = run2.data&&run2.data.id;
+    if(!runId2) { setS('Erro Actor 2: '+JSON.stringify(run2)); return; }
+    setS('Passo 3/3: Buscando bios e perfis...');
     await waitForRun(runId2);
-    const profiles = await callApify('getResults', {runId: runId2});
-    let saved = 0;
-    for (const item of profiles) {
+    const profiles = await callApify('getResults',{runId:runId2});
+
+    let saved=0;
+    for(const item of profiles) {
+      const linkUrl = item.externalUrl||item.url||item.website||(item.externalUrls&&item.externalUrls[0])||'';
       const lead = {
-        username: item.username || '',
-        full_name: item.fullName || item.full_name || '',
-        bio: item.biography || item.bio || '',
-        followers: item.followersCount || item.followers || 0,
-        following: item.followsCount || item.followingCount || item.following || 0,
-        is_open: item.private === false || item.isPrivate === false,
-        has_link: !!(item.externalUrl || item.url || item.website || (item.externalUrls && item.externalUrls.length)),
-        link_url: item.externalUrl || item.url || item.website || (item.externalUrls && item.externalUrls[0]) || '',
-        is_business: item.isBusinessAccount || false,
+        username: item.username||'',
+        full_name: item.fullName||item.full_name||'',
+        bio: item.biography||item.bio||'',
+        followers: item.followersCount||item.followers||0,
+        following: item.followsCount||item.followingCount||item.following||0,
+        is_open: item.private===false||item.isPrivate===false,
+        has_link: !!(item.externalUrl||item.url||item.website||(item.externalUrls&&item.externalUrls.length)),
+        link_url: linkUrl,
+        link_type: detectLinkType(linkUrl),
+        is_business: item.isBusinessAccount||false,
         fonte: username,
+        user_id: currentUser.id,
         score: 0
       };
-      if (!lead.username) continue;
-      const {error} = await sb.from('leads').upsert(lead, {onConflict: 'username'});
-      if (error) { document.getElementById('apify-status').textContent = 'Erro: ' + error.message; return; }
+      if(!lead.username) continue;
+      const {error} = await sb.from('leads').upsert(lead,{onConflict:'username,user_id'});
+      if(error) { setS('Erro: '+error.message); return; }
       saved++;
     }
-    document.getElementById('apify-status').textContent = '✓ ' + saved + ' leads novos! (' + existingSet.size + ' já existiam)';
-    setTimeout(() => { closeApify(); loadLeads(); }, 2000);
-  } catch(e) {
-    document.getElementById('apify-status').textContent = 'Erro: ' + e.message;
-  }
+    setS('✓ '+saved+' leads novos! ('+existingSet.size+' já existiam)');
+    setTimeout(()=>{ closeApify(); loadLeads(); },2000);
+  } catch(e) { document.getElementById('apify-status').textContent='Erro: '+e.message; }
 }
 
+// IA
 async function fetchBio(lead) {
-  if (bioCache[lead.id]) return bioCache[lead.id];
-  const cfg = loadSettings();
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
-    body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:'Analise esta bio do Instagram e responda em UMA linha curta (máx 12 palavras) em português: qual é o negócio ou perfil desta pessoa? Bio: "'+lead.bio+'". Responda APENAS com a descrição.'}]})
+  if(bioCache[lead.id]) return bioCache[lead.id];
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:'Analise esta bio do Instagram e responda em UMA linha curta (máx 12 palavras) em português: qual é o negócio ou perfil desta pessoa? Bio: "'+lead.bio+'". Responda APENAS com a descrição, sem aspas.'}]})
   });
   const data = await res.json();
-  const txt = (data.content && data.content.find(c=>c.type==='text') && data.content.find(c=>c.type==='text').text) || 'Não foi possível analisar';
-  bioCache[lead.id] = txt;
-  await sb.from('leads').update({bio_summary:txt}).eq('id', lead.id);
+  const txt = data.content?.find(c=>c.type==='text')?.text||'Sem bio disponível';
+  bioCache[lead.id]=txt;
+  await sb.from('leads').update({bio_summary:txt}).eq('id',lead.id);
   return txt;
 }
 
 async function analyzeSingle(id, cellEl) {
-  const lead = allLeads.find(l => l.id===id);
-  if (!lead) return;
-  cellEl.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
-  const txt = await fetchBio(lead).catch(() => 'Erro na análise');
-  cellEl.innerHTML = txt;
-  const idx = allLeads.findIndex(l => l.id===id);
-  if (idx>=0) allLeads[idx].bio_summary = txt;
+  const lead = allLeads.find(l=>l.id===id);
+  if(!lead) return;
+  cellEl.innerHTML='<span class="dots"><span></span><span></span><span></span></span>';
+  const txt = await fetchBio(lead).catch(()=>'Erro na análise');
+  cellEl.innerHTML=`<span>${txt}</span>`;
+  const idx=allLeads.findIndex(l=>l.id===id);
+  if(idx>=0) allLeads[idx].bio_summary=txt;
 }
 
 async function analyzeAll() {
-  const btn = document.getElementById('btn-all');
-  btn.disabled = true;
-  btn.textContent = 'Analisando...';
-  const pending = allLeads.filter(l => !l.bio_summary && l.bio);
-  let done = 0;
-  for (let i=0; i<pending.length; i+=3) {
-    const batch = pending.slice(i, i+3);
-    await Promise.all(batch.map(async lead => {
-      const cell = document.getElementById('bio-'+lead.id);
-      if (cell) cell.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
-      const txt = await fetchBio(lead).catch(() => 'Erro');
-      if (cell) cell.innerHTML = txt;
-      const idx = allLeads.findIndex(l => l.id===lead.id);
-      if (idx>=0) allLeads[idx].bio_summary = txt;
+  const btn=document.getElementById('btn-all');
+  btn.disabled=true; btn.textContent='Analisando...';
+  const pending=allLeads.filter(l=>!l.bio_summary&&l.bio);
+  let done=0;
+  for(let i=0;i<pending.length;i+=3) {
+    const batch=pending.slice(i,i+3);
+    await Promise.all(batch.map(async lead=>{
+      const cell=document.getElementById('bio-'+lead.id);
+      if(cell) cell.innerHTML='<span class="dots"><span></span><span></span><span></span></span>';
+      const txt=await fetchBio(lead).catch(()=>'Erro');
+      if(cell) cell.innerHTML=`<span>${txt}</span>`;
+      const idx=allLeads.findIndex(l=>l.id===lead.id);
+      if(idx>=0) allLeads[idx].bio_summary=txt;
       done++;
-      document.getElementById('analyze-status').textContent = 'Analisando ' + done + ' de ' + pending.length + '...';
+      document.getElementById('analyze-status').textContent='Analisando '+done+' de '+pending.length+'...';
     }));
   }
-  document.getElementById('analyze-status').textContent = '✓ ' + allLeads.length + ' perfis analisados';
-  btn.disabled = false;
-  btn.textContent = 'Analisar todos com IA';
+  document.getElementById('analyze-status').textContent='✓ '+done+' perfis analisados';
+  btn.disabled=false; btn.textContent='Analisar todos com IA';
 }
 
+// DIRECT
 function requalify() {
-  const bar = document.getElementById('progress');
-  let p = 0; bar.style.width = '0%';
-  const iv = setInterval(() => { p+=15; if(p>=100){p=100;clearInterval(iv);setTimeout(()=>bar.style.width='0%',500);} bar.style.width=p+'%'; }, 80);
+  const bar=document.getElementById('progress');
+  let p=0; bar.style.width='0%';
+  const iv=setInterval(()=>{ p+=15; if(p>=100){p=100;clearInterval(iv);setTimeout(()=>bar.style.width='0%',500);} bar.style.width=p+'%'; },80);
   renderLeads();
 }
 
 function openDirect(id) {
-  currentLead = allLeads.find(l => l.id===id);
-  if (!currentLead) return;
-  const {score, breakdown} = calcScore(currentLead);
-  const color = COLORS[allLeads.indexOf(currentLead)%COLORS.length];
-  const initials = (currentLead.full_name||currentLead.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  document.getElementById('modal-user').innerHTML = `
+  currentLead=allLeads.find(l=>l.id===id);
+  if(!currentLead) return;
+  const {score,breakdown}=calcScore(currentLead);
+  const color=COLORS[allLeads.findIndex(x=>x.id===id)%COLORS.length]||COLORS[0];
+  const initials=(currentLead.full_name||currentLead.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('modal-user').innerHTML=`
     <div class="avatar" style="width:38px;height:38px;background:${color}22;color:${color}">${initials}</div>
     <div><div style="font-weight:600;font-size:14px">${currentLead.full_name||currentLead.username}</div>
     <div style="font-size:12px;color:#888">@${currentLead.username}</div></div>
     <div style="margin-left:auto;font-size:22px;font-weight:700;color:${scoreColor(score)}">${score}</div>`;
-  document.getElementById('modal-breakdown').innerHTML = '<b>Score:</b> ' + breakdown.map(b=>`<span style="color:${b.pts.startsWith('+')?'#3b6d11':'#a32d2d'}">${b.pts}</span> ${b.desc}`).join(' · ');
-  document.getElementById('msg-text').value = '';
-  document.getElementById('modal-status').textContent = '';
+  document.getElementById('modal-breakdown').innerHTML='<b>Score:</b> '+breakdown.map(b=>`<span style="color:#3b6d11">${b.pts}</span> ${b.desc}`).join(' · ');
+  document.getElementById('msg-text').value='';
+  document.getElementById('modal-status').textContent='';
   document.getElementById('sent-ok').classList.add('hidden');
   document.getElementById('modal').classList.remove('hidden');
 }
-
-function closeModal() {
-  document.getElementById('modal').classList.add('hidden');
-  currentLead = null;
-}
+function closeModal() { document.getElementById('modal').classList.add('hidden'); currentLead=null; }
 
 async function generateMsg() {
-  if (!currentLead) return;
-  const cfg = loadSettings();
-  const context = cfg.businessContext || 'Ofereço soluções de pagamento e ecommerce.';
-  document.getElementById('modal-status').textContent = 'Gerando mensagem...';
-  document.getElementById('msg-text').value = '';
+  if(!currentLead) return;
+  const cfg=loadSettings();
+  const context=cfg.businessContext||'Ofereço soluções de pagamento e ecommerce.';
+  document.getElementById('modal-status').textContent='Gerando mensagem...';
+  document.getElementById('msg-text').value='';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
-      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:'Crie uma mensagem curta de prospecção para Instagram Direct (máximo 3 linhas, tom natural e humano, sem parecer spam) para "'+( currentLead.full_name||currentLead.username)+'" (@'+currentLead.username+'). Bio: "'+( currentLead.bio||'sem bio')+'". Perfil '+(currentLead.is_open?'aberto':'fechado')+(currentLead.has_link?', tem link na bio':'')+'. Contexto do meu negócio: '+context+'. Responda APENAS com o texto da mensagem, sem aspas.'}]})
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:'Crie uma mensagem curta de prospecção para Instagram Direct (máximo 3 linhas, tom natural e humano, sem parecer spam) para "'+(currentLead.full_name||currentLead.username)+'" (@'+currentLead.username+'). Bio: "'+(currentLead.bio||'sem bio')+'". Perfil '+(currentLead.is_open?'aberto':'fechado')+(currentLead.has_link?', tem link na bio':'')+'. Contexto do meu negócio: '+context+'. Responda APENAS com o texto da mensagem, sem aspas.'}]})
     });
-    const data = await res.json();
-    const txt = (data.content && data.content.find(c=>c.type==='text') && data.content.find(c=>c.type==='text').text) || 'Oi! Vi seu perfil e me interessei pelo que você faz. Tenho uma solução que pode ajudar muito suas vendas. Posso te contar mais?';
-    document.getElementById('msg-text').value = txt;
-    document.getElementById('modal-status').textContent = 'Pronto! Edite se quiser.';
-  } catch(e) {
-    document.getElementById('modal-status').textContent = 'Erro — tente novamente';
-  }
+    const data=await res.json();
+    const txt=data.content?.find(c=>c.type==='text')?.text||'Oi! Vi seu perfil e me interessei. Posso te contar mais?';
+    document.getElementById('msg-text').value=txt;
+    document.getElementById('modal-status').textContent='Pronto! Edite se quiser.';
+  } catch(e) { document.getElementById('modal-status').textContent='Erro — tente novamente'; }
 }
 
 async function sendDirect() {
-  const msg = document.getElementById('msg-text').value.trim();
-  if (!msg || !currentLead) return;
+  const msg=document.getElementById('msg-text').value.trim();
+  if(!msg||!currentLead) return;
   navigator.clipboard.writeText(msg).catch(()=>{});
-  window.open('https://ig.me/m/'+currentLead.username, '_blank');
-  await sb.from('leads').update({direct_sent:true}).eq('id', currentLead.id);
+  window.open('https://ig.me/m/'+currentLead.username,'_blank');
+  const history=currentLead.direct_history||[];
+  history.push({type:'sent',text:msg,date:new Date().toISOString()});
+  await sb.from('leads').update({direct_sent:true,contacted:true,direct_history:history}).eq('id',currentLead.id);
+  const idx=allLeads.findIndex(l=>l.id===currentLead.id);
+  if(idx>=0) { allLeads[idx].contacted=true; allLeads[idx].direct_history=history; }
   document.getElementById('sent-ok').classList.remove('hidden');
-  setTimeout(() => closeModal(), 2000);
+  setTimeout(()=>{ closeModal(); renderLeads(); renderContacted(); },2000);
 }
 
+// CHAT
+function openChat(id) {
+  chatLead=allLeads.find(l=>l.id===id);
+  if(!chatLead) return;
+  document.getElementById('chat-title').textContent=chatLead.full_name||chatLead.username;
+  document.getElementById('chat-sub').textContent='@'+chatLead.username;
+  renderChatHistory();
+  document.getElementById('chat-input').value='';
+  document.getElementById('chat-modal').classList.remove('hidden');
+}
+function closeChat() { document.getElementById('chat-modal').classList.add('hidden'); chatLead=null; }
+
+function renderChatHistory() {
+  const history=chatLead.direct_history||[];
+  const el=document.getElementById('chat-history');
+  el.innerHTML='';
+  if(!history.length) { el.innerHTML='<div class="chat-empty">Nenhuma mensagem ainda.<br>Adicione o histórico manualmente.</div>'; return; }
+  history.forEach(m=>{
+    const div=document.createElement('div');
+    div.className='chat-msg '+(m.type==='sent'?'sent':'received');
+    const date=m.date?new Date(m.date).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    div.innerHTML=m.text+(date?`<div class="chat-msg-meta">${date}</div>`:'');
+    el.appendChild(div);
+  });
+  el.scrollTop=el.scrollHeight;
+}
+
+async function addChatMsg() {
+  if(!chatLead) return;
+  const input=document.getElementById('chat-input');
+  const type=document.getElementById('chat-msg-type').value;
+  const text=input.value.trim();
+  if(!text) return;
+  const history=chatLead.direct_history||[];
+  history.push({type,text,date:new Date().toISOString()});
+  await sb.from('leads').update({direct_history:history}).eq('id',chatLead.id);
+  const idx=allLeads.findIndex(l=>l.id===chatLead.id);
+  if(idx>=0) allLeads[idx].direct_history=history;
+  chatLead.direct_history=history;
+  input.value='';
+  renderChatHistory();
+}
+
+// ADMIN
+let allProfiles = [];
+
+async function loadAdminData() {
+  // Busca todos os perfis
+  const {data: profiles} = await sb.from('profiles').select('*').order('created_at', {ascending:false});
+  allProfiles = profiles || [];
+
+  // Busca contagem de leads por user_id
+  const {data: leadCounts} = await sb.from('leads').select('user_id, contacted');
+  const countMap = {};
+  const contactedMap = {};
+  (leadCounts||[]).forEach(l => {
+    countMap[l.user_id] = (countMap[l.user_id]||0) + 1;
+    if(l.contacted) contactedMap[l.user_id] = (contactedMap[l.user_id]||0) + 1;
+  });
+  allProfiles = allProfiles.map(p => ({
+    ...p,
+    leads_count: countMap[p.id]||0,
+    contacted_count: contactedMap[p.id]||0
+  }));
+
+  // Stats
+  document.getElementById('adm-total-clients').textContent = allProfiles.filter(p=>p.role!=='admin').length;
+  document.getElementById('adm-active-clients').textContent = allProfiles.filter(p=>p.role!=='admin'&&p.is_active).length;
+  document.getElementById('adm-total-leads').textContent = allProfiles.reduce((a,p)=>a+p.leads_count,0);
+  document.getElementById('adm-total-contacted').textContent = allProfiles.reduce((a,p)=>a+p.contacted_count,0);
+
+  renderAdminClients();
+}
+
+function renderAdminClients() {
+  const search = (document.getElementById('admin-search').value||'').toLowerCase();
+  const clients = allProfiles.filter(p => p.role !== 'admin' && (!search || p.email.includes(search)));
+  const body = document.getElementById('admin-clients-body');
+  body.innerHTML = '';
+  if (!clients.length) {
+    body.innerHTML = '<div style="padding:30px;text-align:center;color:#aaa">Nenhum cliente encontrado.</div>';
+    return;
+  }
+  clients.forEach(p => {
+    const pct = p.leads_limit > 0 ? Math.min(100, Math.round((p.leads_count/p.leads_limit)*100)) : 0;
+    const row = document.createElement('div');
+    row.className = 'client-row';
+    row.innerHTML = `
+      <div>
+        <div style="font-weight:600;font-size:13px">${p.email}</div>
+        <div style="font-size:11px;color:#aaa">Desde ${new Date(p.created_at).toLocaleDateString('pt-BR')}</div>
+      </div>
+      <div><span class="status-badge ${p.is_active?'status-active':'status-blocked'}">${p.is_active?'Ativo':'Bloqueado'}</span></div>
+      <div>
+        <div style="font-weight:600">${p.leads_count}</div>
+        <div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+        <div style="font-size:10px;color:#aaa">${pct}% do limite</div>
+      </div>
+      <div style="font-weight:600;color:#6b35c0">${p.contacted_count}</div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <input class="limit-input" type="number" value="${p.leads_limit}" id="limit-${p.id}" min="0">
+        <button class="admin-btn admin-btn-primary" onclick="saveLimit('${p.id}')">Salvar</button>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="admin-btn admin-btn-primary" onclick="viewClientLeads('${p.id}','${p.email}')">Ver leads</button>
+        ${p.is_active
+          ? `<button class="admin-btn admin-btn-danger" onclick="toggleClient('${p.id}',false)">Bloquear</button>`
+          : `<button class="admin-btn admin-btn-success" onclick="toggleClient('${p.id}',true)">Ativar</button>`}
+      </div>`;
+    body.appendChild(row);
+  });
+}
+
+async function saveLimit(userId) {
+  const val = parseInt(document.getElementById('limit-'+userId).value)||0;
+  await sb.from('profiles').update({leads_limit:val}).eq('id',userId);
+  const idx = allProfiles.findIndex(p=>p.id===userId);
+  if(idx>=0) allProfiles[idx].leads_limit = val;
+  renderAdminClients();
+}
+
+async function toggleClient(userId, active) {
+  await sb.from('profiles').update({is_active:active}).eq('id',userId);
+  const idx = allProfiles.findIndex(p=>p.id===userId);
+  if(idx>=0) allProfiles[idx].is_active = active;
+  renderAdminClients();
+  // Atualiza stat
+  document.getElementById('adm-active-clients').textContent = allProfiles.filter(p=>p.role!=='admin'&&p.is_active).length;
+}
+
+async function viewClientLeads(userId, email) {
+  document.getElementById('client-leads-title').textContent = 'Leads de ' + email;
+  document.getElementById('client-leads-sub').textContent = 'Carregando...';
+  document.getElementById('client-leads-modal').classList.remove('hidden');
+  const {data} = await sb.from('leads').select('*').eq('user_id', userId).order('score',{ascending:false});
+  const leads = data||[];
+  document.getElementById('client-leads-sub').textContent = leads.length + ' leads · ' + leads.filter(l=>l.contacted).length + ' contactados';
+  const list = document.getElementById('client-leads-list');
+  list.innerHTML = '';
+  if(!leads.length) { list.innerHTML='<div style="padding:30px;text-align:center;color:#aaa">Nenhum lead.</div>'; return; }
+  leads.forEach(l => {
+    const row = document.createElement('div');
+    row.className = 'mini-lead-row';
+    row.innerHTML = `
+      <div>
+        <a href="https://instagram.com/${l.username}" target="_blank" style="font-weight:600;color:#1a1a1a;text-decoration:none;font-size:12px">${l.full_name||l.username}</a>
+        <div style="font-size:10px;color:#aaa">@${l.username}</div>
+      </div>
+      <div><span class="badge ${l.is_open?'b-open':'b-closed'}" style="font-size:10px">${l.is_open?'Aberto':'Fechado'}</span>${l.contacted?'<br><span class="badge" style="background:#f0ebfb;color:#6b35c0;font-size:9px;margin-top:2px">Contactado</span>':''}</div>
+      <div style="font-weight:700;color:${l.score>=70?'#D85A30':l.score>=40?'#BA7517':'#999'}">${l.score}</div>
+      <div style="font-size:11px;color:#6b35c0">${l.fonte?'@'+l.fonte:'—'}</div>
+      <div style="font-size:11px;color:#666">${l.bio_summary||l.bio||'—'}</div>`;
+    list.appendChild(row);
+  });
+}
+
+function closeClientLeads() { document.getElementById('client-leads-modal').classList.add('hidden'); }
+
+function goToAdmin() {
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('admin-screen').style.display='block';
+  document.getElementById('admin-user-badge').textContent = '👤 '+currentUser.email+' (admin)';
+  loadAdminData();
+}
+
+function goToApp() {
+  document.getElementById('admin-screen').style.display='none';
+  document.getElementById('app').classList.remove('hidden');
+}
+
+// INIT
 async function init() {
   try {
-    const res = await fetch('/api/config');
-    const cfg = await res.json();
-    window.ANTHROPIC_KEY = cfg.anthropicKey || '';
+    const res=await fetch('/api/config');
+    const cfg=await res.json();
+    window.ANTHROPIC_KEY=cfg.anthropicKey||'';
   } catch(e) {}
-  renderKw();
-  await loadLeads();
+
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(session) {
+      currentUser=session.user;
+      // Verifica role
+      const {data:profile} = await sb.from('profiles').select('role,is_active').eq('id',currentUser.id).single();
+      document.getElementById('auth-screen').style.display='none';
+      document.getElementById('app').classList.remove('hidden');
+      document.getElementById('user-email-badge').textContent='👤 '+currentUser.email;
+      if(profile && profile.role==='admin') {
+        document.getElementById('btn-admin').style.display='block';
+      }
+      renderKw();
+      await loadLeads();
+    } else {
+      currentUser=null;
+      document.getElementById('auth-screen').style.display='flex';
+      document.getElementById('app').classList.add('hidden');
+      document.getElementById('admin-screen').style.display='none';
+    }
+  });
 }
 
 init();
