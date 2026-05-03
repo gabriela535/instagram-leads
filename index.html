@@ -694,8 +694,15 @@ async function runApify() {
 
     setS('Passo 2/3: Verificando leads novos...');
     const usernames = followers.map(f=>f.username||f.userName).filter(Boolean);
-    const {data:existing} = await sb.from('leads').select('username').eq('user_id',currentUser.id).in('username',usernames);
-    const existingSet = new Set((existing||[]).map(e=>e.username));
+    
+    // Busca duplicatas em lotes de 50 para evitar timeout
+    let existingUsernames = [];
+    for(let i=0; i<usernames.length; i+=50) {
+      const batch = usernames.slice(i, i+50);
+      const {data:existing} = await sb.from('leads').select('username').eq('user_id',currentUser.id).in('username',batch);
+      existingUsernames = existingUsernames.concat((existing||[]).map(e=>e.username));
+    }
+    const existingSet = new Set(existingUsernames);
     const newUsernames = usernames.filter(u=>!existingSet.has(u));
     if(!newUsernames.length) { setS('Todos os seguidores já estão na sua base!'); return; }
 
