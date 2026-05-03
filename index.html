@@ -689,17 +689,21 @@ async function runApify() {
     if(!runId1) { setS('Erro Actor 1: '+JSON.stringify(run1)); return; }
     setS('Passo 1/3: Aguardando seguidores... (1-2 min)');
     await waitForRun(runId1);
+    setS('Passo 1/3: Buscando resultados do Actor 1...');
     const followers = await callApify('getResults',{runId:runId1});
+    setS('Passo 1/3: ' + followers.length + ' seguidores recebidos. Extraindo usernames...');
     if(!followers.length) { setS('Nenhum seguidor encontrado.'); return; }
 
-    setS('Passo 2/3: Verificando leads novos...');
     const usernames = followers.map(f=>f.username||f.userName).filter(Boolean);
+    setS('Passo 2/3: ' + usernames.length + ' usernames. Verificando duplicatas (lote 1)...');
     
     // Busca duplicatas em lotes de 50 para evitar timeout
     let existingUsernames = [];
     for(let i=0; i<usernames.length; i+=50) {
       const batch = usernames.slice(i, i+50);
-      const {data:existing} = await sb.from('leads').select('username').eq('user_id',currentUser.id).in('username',batch);
+      setS('Passo 2/3: Verificando lote ' + (Math.floor(i/50)+1) + ' de ' + Math.ceil(usernames.length/50) + '...');
+      const {data:existing, error:existErr} = await sb.from('leads').select('username').eq('user_id',currentUser.id).in('username',batch);
+      if(existErr) { setS('Erro na verificação: ' + existErr.message); return; }
       existingUsernames = existingUsernames.concat((existing||[]).map(e=>e.username));
     }
     const existingSet = new Set(existingUsernames);
