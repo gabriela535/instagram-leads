@@ -737,6 +737,10 @@ async function runApify() {
       };
     }).filter(l=>l.username);
 
+    // Renova sessão antes de salvar
+    const {data:{session}} = await sb.auth.getSession();
+    if(!session) { setS('Sessão expirada. Faça login novamente.'); return; }
+    
     setS('Salvando '+leadsToSave.length+' leads...');
     let savedCount = 0;
     for(const lead of leadsToSave) {
