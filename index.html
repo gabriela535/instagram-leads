@@ -662,8 +662,7 @@ async function callApify(action, payload) {
   return res.json();
 }
 async function getApifyResults(runId) {
-  const r = await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${window.APIFY_TOKEN}`);
-  return r.json();
+  return callApify('getResults', {runId});
 }
 async function waitForRun(runId) {
   while(true) {
