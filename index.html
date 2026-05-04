@@ -662,7 +662,8 @@ async function callApify(action, payload) {
   return res.json();
 }
 async function getApifyResults(runId) {
-  const r = await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${window.APIFY_TOKEN}`);
+  const fields = 'username,biography,followersCount,followsCount,fullName,private,externalUrl,externalUrls,isBusinessAccount';
+  const r = await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${window.APIFY_TOKEN}&fields=${fields}`);
   const data = await r.json();
   if(Array.isArray(data)) return data;
   if(data && Array.isArray(data.items)) return data.items;
