@@ -660,6 +660,12 @@ async function callApify(action, payload) {
   const res = await fetch('/api/apify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload})});
   return res.json();
 }
+async function getApifyResults(runId) {
+  const cfgRes = await fetch('/api/config');
+  const cfg = await cfgRes.json();
+  const r = await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${cfg.apifyToken}`);
+  return r.json();
+}
 async function waitForRun(runId) {
   while(true) {
     await new Promise(r=>setTimeout(r,5000));
@@ -692,7 +698,7 @@ async function runApify() {
     setS('Passo 1/3: Aguardando seguidores... (1-2 min)');
     await waitForRun(runId1);
     setS('Passo 1/3: Buscando resultados do Actor 1...');
-    const followers = await callApify('getResults',{runId:runId1});
+    const followers = await getApifyResults(runId1);
     setS('Passo 1/3: ' + followers.length + ' seguidores recebidos. Extraindo usernames...');
     if(!followers.length) { setS('Nenhum seguidor encontrado.'); return; }
 
@@ -706,7 +712,7 @@ async function runApify() {
     if(!runId2) { setS('Erro Actor 2: '+JSON.stringify(run2)); return; }
     setS('Passo 3/3: Buscando bios e perfis...');
     await waitForRun(runId2);
-    const profiles = await callApify('getResults',{runId:runId2});
+    const profiles = await getApifyResults(runId2);
 
     const leadsToSave = profiles.map(item => {
       const linkUrl = item.externalUrl||item.url||item.website||(item.externalUrls&&item.externalUrls[0])||'';
