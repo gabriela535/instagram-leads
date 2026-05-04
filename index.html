@@ -737,7 +737,7 @@ async function runApify() {
     const {error} = await sb.from('leads').upsert(leadsToSave, {onConflict:'username,user_id'});
     if(error) { setS('Erro ao salvar: '+error.message); return; }
     setS('✓ '+leadsToSave.length+' leads salvos!');
-    setTimeout(()=>{ closeApify(); loadLeads(); updateFonteFilter(); },2000);
+    setTimeout(()=>{ closeApify(); loadLeads(); },2000);
   } catch(e) { document.getElementById('apify-status').textContent='Erro: '+e.message; }
 }
 
