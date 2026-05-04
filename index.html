@@ -423,6 +423,7 @@ const bioCache = {};
 let currentLead = null, chatLead = null, allLeads = [], currentUser = null;
 let authMode = 'login';
 window.ANTHROPIC_KEY = '';
+window.APIFY_TOKEN = '';
 
 // AUTH
 function toggleAuthMode() {
@@ -661,9 +662,7 @@ async function callApify(action, payload) {
   return res.json();
 }
 async function getApifyResults(runId) {
-  const cfgRes = await fetch('/api/config');
-  const cfg = await cfgRes.json();
-  const r = await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${cfg.apifyToken}`);
+  const r = await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${window.APIFY_TOKEN}`);
   return r.json();
 }
 async function waitForRun(runId) {
@@ -1024,6 +1023,7 @@ async function init() {
     const res=await fetch('/api/config');
     const cfg=await res.json();
     window.ANTHROPIC_KEY=cfg.anthropicKey||'';
+    window.APIFY_TOKEN=cfg.apifyToken||'';
   } catch(e) {}
 
   sb.auth.onAuthStateChange(async(event,session)=>{
