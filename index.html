@@ -708,7 +708,7 @@ async function runApify() {
     const newUsernames = usernames;
     if(!newUsernames.length) { setS('Nenhum seguidor encontrado.'); return; }
     setS('Passo 2/3: Buscando bios de '+newUsernames.length+' perfis...');
-    const run2 = await callApify('startRun',{actorId:'apify/instagram-profile-scraper',input:{usernames:newUsernames}});
+    const run2 = await callApify('startRun',{actorId:'apify~instagram-profile-scraper',input:{usernames:newUsernames}});
     const runId2 = run2.data&&run2.data.id;
     if(!runId2) { setS('Erro Actor 2: '+JSON.stringify(run2)); return; }
     setS('Passo 3/3: Buscando bios e perfis...');
