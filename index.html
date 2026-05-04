@@ -697,11 +697,10 @@ async function runApify() {
     if(!followers.length) { setS('Nenhum seguidor encontrado.'); return; }
 
     const usernames = followers.map(f=>f.username||f.userName).filter(Boolean);
-    setS('Passo 2/3: ' + usernames.length + ' seguidores. Buscando bios dos novos...');
-    const newUsernames = usernames; // deixa o upsert lidar com duplicatas
-    if(!newUsernames.length) { setS('Todos os seguidores já estão na sua base!'); return; }
-
-    setS('Passo 2/3: '+newUsernames.length+' leads novos. Buscando bios...');
+    setS('Passo 2/3: ' + usernames.length + ' seguidores. Iniciando busca de bios...');
+    const newUsernames = usernames;
+    if(!newUsernames.length) { setS('Nenhum seguidor encontrado.'); return; }
+    setS('Passo 2/3: Buscando bios de '+newUsernames.length+' perfis...');
     const run2 = await callApify('startRun',{actorId:'datadoping~instagram-profile-scraper',input:{usernames:newUsernames}});
     const runId2 = run2.data&&run2.data.id;
     if(!runId2) { setS('Erro Actor 2: '+JSON.stringify(run2)); return; }
@@ -732,7 +731,7 @@ async function runApify() {
       if(error) { setS('Erro: '+error.message); return; }
       saved++;
     }
-    setS('✓ '+saved+' leads novos! ('+existingSet.size+' já existiam)');
+    setS('✓ '+saved+' leads salvos!');
     setTimeout(()=>{ closeApify(); loadLeads(); },2000);
   } catch(e) { document.getElementById('apify-status').textContent='Erro: '+e.message; }
 }
