@@ -708,10 +708,9 @@ async function runApify() {
     await waitForRun(runId2);
     const profiles = await callApify('getResults',{runId:runId2});
 
-    let saved=0;
-    for(const item of profiles) {
+    const leadsToSave = profiles.map(item => {
       const linkUrl = item.externalUrl||item.url||item.website||(item.externalUrls&&item.externalUrls[0])||'';
-      const lead = {
+      return {
         username: item.username||'',
         full_name: item.fullName||item.full_name||'',
         bio: item.biography||item.bio||'',
@@ -726,12 +725,12 @@ async function runApify() {
         user_id: currentUser.id,
         score: 0
       };
-      if(!lead.username) continue;
-      const {error} = await sb.from('leads').upsert(lead,{onConflict:'username,user_id'});
-      if(error) { setS('Erro: '+error.message); return; }
-      saved++;
-    }
-    setS('✓ '+saved+' leads salvos!');
+    }).filter(l=>l.username);
+
+    setS('Salvando '+leadsToSave.length+' leads...');
+    const {error} = await sb.from('leads').upsert(leadsToSave, {onConflict:'username,user_id'});
+    if(error) { setS('Erro ao salvar: '+error.message); return; }
+    setS('✓ '+leadsToSave.length+' leads salvos!');
     setTimeout(()=>{ closeApify(); loadLeads(); },2000);
   } catch(e) { document.getElementById('apify-status').textContent='Erro: '+e.message; }
 }
