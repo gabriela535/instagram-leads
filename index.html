@@ -736,9 +736,15 @@ async function runApify() {
     }).filter(l=>l.username);
 
     setS('Salvando '+leadsToSave.length+' leads...');
-    const {error} = await sb.from('leads').upsert(leadsToSave, {onConflict:'username,user_id'});
-    if(error) { setS('Erro ao salvar: '+error.message); return; }
-    setS('✓ '+leadsToSave.length+' leads salvos!');
+    let savedCount = 0;
+    for(let i=0; i<leadsToSave.length; i+=10) {
+      const batch = leadsToSave.slice(i, i+10);
+      const {error} = await sb.from('leads').upsert(batch, {onConflict:'username,user_id'});
+      if(error) { setS('Erro ao salvar lote '+(Math.floor(i/10)+1)+': '+error.message); return; }
+      savedCount += batch.length;
+      setS('Salvando... '+savedCount+'/'+leadsToSave.length);
+    }
+    setS('✓ '+savedCount+' leads salvos!');
     setTimeout(()=>{ closeApify(); loadLeads(); },2000);
   } catch(e) { document.getElementById('apify-status').textContent='Erro: '+e.message; }
 }
